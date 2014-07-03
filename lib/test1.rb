@@ -11,7 +11,7 @@ parser = Partner.configure do |config|
   #end
 end
 
-#result = parser.parse(ARGV.dup)
-#result.options
-#result.command
-#result.arguments
+result = parser.parse
+result.options
+result.command
+result.arguments

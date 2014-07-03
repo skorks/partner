@@ -9,9 +9,14 @@ module Partner
     end
 
     def option(canonical_name, options = {})
-      canonical_name_sym = canonical_name.to_sym
-      options[canonical_name_sym] = OptionTemplate.new(canonical_name_sym, options)
+      add_option(canonical_name.to_sym, options)
       self
+    end
+
+    private
+
+    def add_option(canonical_name_sym, options)
+      @options[canonical_name_sym] = OptionTemplate.new(canonical_name_sym, options)
     end
   end
 end
