@@ -1,5 +1,7 @@
 require 'partner/parser_result'
-require 'partner/cli_token_iterator'
+require 'partner/option_parser'
+require 'partner/command_parser'
+
 
 module Partner
   class Parser
@@ -10,23 +12,12 @@ module Partner
     end
 
     def parse(argv = ARGV.dup)
-      token_iterator = cli_token_iterator(argv)
-      while token = token_iterator.next do
-        if token.option? && config.option_template_library.contains?(token)
-          # we need to build the concrete option now
-        else
-          # we don't know what to do with this token so put it in the leftovers list
-        end
-        # if token is an option
-        puts token
-      end
-      ParserResult.new
-    end
-
-    private
-
-    def cli_token_iterator(argv)
-      CliTokenIterator.new(argv)
+      option_parser_result = OptionParser.new(config).parse(argv)
+      command_parser_result = CommandParser.new(config).parse(option_parser_result.leftovers)
+      ParserResult.new(option_parser_result.options, command_parser_result.command, command_parser_result.leftovers)
+    rescue => e
+      #TODO introduce an error reporter here instead of a puts
+      $stderr.puts "An error has occured: #{e.message}, #{e.backtrace.join("\n")}"
     end
   end
 end

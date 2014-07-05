@@ -1,0 +1,5 @@
+long option with string value
+  - an option we recognise was passed and it had a value
+    - it should end up in the options list
+  - an option we recognise was passed in but it didn't have value
+  - an option was passed in but not one we recognise

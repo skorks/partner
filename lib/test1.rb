@@ -1,5 +1,7 @@
 require 'partner'
 
+# ruby -Ilib lib/test1.rb --foo
+
 parser = Partner.configure do |config|
   config.option :foo
   #config.option :foo, desc: 'Foo option'                   # type is string, default value is nil
@@ -10,8 +12,11 @@ parser = Partner.configure do |config|
     #command.option :goo   # type is string, default value is nil
   #end
 end
+puts 'start'
 
 result = parser.parse
 result.options
 result.command
 result.arguments
+
+puts 'end'

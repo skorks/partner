@@ -1,6 +1,6 @@
 module Partner
   class ParserResult
-    def initialize
+    def initialize(options, command, arguments)
     end
 
     def options
