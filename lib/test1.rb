@@ -12,11 +12,7 @@ parser = Partner.configure do |config|
     #command.option :goo   # type is string, default value is nil
   #end
 end
-puts 'start'
-
 result = parser.parse
 result.options
 result.command
 result.arguments
-
-puts 'end'

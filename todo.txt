@@ -1,3 +1,6 @@
+- get rspec configured
+- make sure we can execute a basic spec
+
 long option with string value
   - an option we recognise was passed and it had a value
     - it should end up in the options list

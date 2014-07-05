@@ -12,8 +12,13 @@ module Partner
     end
 
     def parse(argv = ARGV.dup)
+      ::Partner.logger.debug "#{self.class.name} parse start"
+
       option_parser_result = OptionParser.new(config).parse(argv)
       command_parser_result = CommandParser.new(config).parse(option_parser_result.leftovers)
+
+      ::Partner.logger.debug "#{self.class.name} parse end"
+
       ParserResult.new(option_parser_result.options, command_parser_result.command, command_parser_result.leftovers)
     rescue => e
       #TODO introduce an error reporter here instead of a puts
