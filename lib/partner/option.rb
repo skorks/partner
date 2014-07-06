@@ -19,9 +19,15 @@ module Partner
       return @value if @value != nil
       if @potential_value == nil
         @value = template.default_value
+      elsif template.multi
+        @value = [@potential_value]
       else
         @value = @potential_value
       end
+    end
+
+    def value=(value)
+      @value = value
     end
 
     def given?

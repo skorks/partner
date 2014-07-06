@@ -7,18 +7,26 @@ long option with string value
   - an option was not passed in but has default                                 DONE
     - should be present in the final option list with default value             DONE
     - the result should indicate that it was not passed in on the command line  DONE
-  - configured to have different value to the canonical name
-    - must ensure starts with -- if not already
-    - if starts with single dash, that's an error
-    - must have only dashes and small letters in it
+  - configured to have different value to the canonical name                    DONE
+    - if not present make from canonical name                                   DONE
+    - must ensure starts with -- if not already                                 DONE
+    - if starts with single dash, that's an error                               DONE
+    - must have only dashes and small letters in it                             DONE
+    - if starts with more than 2 dashes that's an error                         DONE
+
+error when non boolean option is passed in on the command line without a value
 
 short options with string value
   - configuration
-    - default case, it is just the one char
-    - can be 1 or 2 chars
-    - if two chars first char must be -
-    - second char (or first if one char) must be small letter, capital letter or number
-    - must not conflict with existing short name
+    - default case, it is just the one char                                             DONE
+    - can be 1 or 2 chars                                                               DONE
+    - if two chars first char must be -                                                 DONE
+    - second char (or first if one char) must be small letter, capital letter or number DONE
+    - must not conflict with existing short name                                        DONE
+
+canonical name can't conflict             DONE
+long name can't conflict                  DONE
+short name can't conflict                 DONE
 
 long option with boolean value
   - no default given should default to false                        DONE
@@ -36,9 +44,9 @@ negated long option (boolean value)
 
 combined short options (-xyz)                                       DONE
 
-multi value short option
+multi value short option                                            DONE
 
-multi value long option
+multi value long option                                             DONE
 
 short option with value separated by equals
 

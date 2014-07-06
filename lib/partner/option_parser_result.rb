@@ -10,7 +10,16 @@ module Partner
     end
 
     def add_option(option)
-      @options[option.name] = option
+      if option.template.multi
+        existing_option = @options[option.name]
+        if existing_option && existing_option.given?
+          existing_option.value += option.value
+        else
+          @options[option.name] = option
+        end
+      else
+        @options[option.name] = option
+      end
     end
 
     def add_options(options)

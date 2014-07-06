@@ -19,6 +19,7 @@ module Partner
 
     def combined_short_options?
       token.start_with?('-') &&
+        !token.start_with?('--') &&
         token.length > 2
     end
 
