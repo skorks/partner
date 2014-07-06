@@ -9,15 +9,23 @@ module Partner
     def option?
       if short_option? ||
         long_option? ||
-        negated_long_option?
+        negated_long_option? ||
+        combined_short_options?
         true
       else
         false
       end
     end
 
+    def combined_short_options?
+      token.start_with?('-') &&
+        token.length > 2
+    end
+
     def short_option?
-      token.start_with?('-') && !token.start_with?('--')
+      token.start_with?('-') &&
+        token.length == 2 &&
+        !token.start_with?('--')
     end
 
     def long_option?

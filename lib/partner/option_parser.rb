@@ -25,11 +25,12 @@ module Partner
         if token_classifier.terminator?
           result.add_leftovers(token_iterator.remaining)
           break
+        elsif token_classifier.combined_short_options?
+          token.gsub(/-/, '').split('').map {|letter| "-#{letter}"}.each do |new_token|
+            result.add_option(build_option(new_token, token_iterator))
+          end
         elsif token_classifier.option?
-          finder = OptionTemplateFinderFactory.new(option_template_library).build(token_classifier)
-          option_factory_builder = OptionFactoryBuilder.new(finder, token_classifier)
-          option_factory = option_factory_builder.build(token)
-          result.add_option(option_factory.build(token_iterator))
+          result.add_option(build_option(token, token_iterator))
         else
           result.add_leftover(token)
         end
@@ -40,6 +41,14 @@ module Partner
     end
 
     private
+
+    def build_option(token, token_iterator)
+      token_classifier = TokenClassifier.new(token)
+      finder = OptionTemplateFinderFactory.new(option_template_library).build(token_classifier)
+      option_factory_builder = OptionFactoryBuilder.new(finder, token_classifier)
+      option_factory = option_factory_builder.build(token)
+      option_factory.build(token_iterator)
+    end
 
     def options_with_default_values
       options = []
