@@ -31,6 +31,8 @@ long option with boolean value
 short option with boolean value                                     DONE
 
 negated long option (boolean value)
+  - for legitimate boolean value                                    DONE
+  - for a non-boolean should error                                  DONE
 
 combined short options (-xyz)
 

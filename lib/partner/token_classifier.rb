@@ -1,40 +1,35 @@
-require 'partner/option_factory/long_option'
-require 'partner/option_factory/short_option'
-
 module Partner
   class TokenClassifier
-    #OPTION_TOKEN_TYPES = [:long_option]
-    #TOKEN_TYPES = OPTION_TOKEN_TYPES
+    attr_reader :token
 
-    attr_reader :option_template_library
-
-    def initialize(option_template_library)
-      @option_template_library = option_template_library
+    def initialize(token)
+      @token = token
     end
 
-    def option_token?(token)
-      if !terminator_token?(token) &&
-        (token.start_with?('-') || token.start_with?('--'))
+    def option?
+      if short_option? ||
+        long_option? ||
+        negated_long_option?
         true
       else
         false
       end
     end
 
-    def terminator_token?(token)
+    def short_option?
+      token.start_with?('-') && !token.start_with?('--')
+    end
+
+    def long_option?
+      token.start_with?('--') && !token.start_with?('--no-') && !terminator?
+    end
+
+    def negated_long_option?
+      token.start_with?('--no-')
+    end
+
+    def terminator?
       token == '--'
     end
-
-    def option_factory_for(token, token_iterator)
-      if token.start_with?('-') && !token.start_with?('--')
-        OptionFactory::ShortOption.new(option_template_library, token, token_iterator)
-      elsif token.start_with?('--')
-        OptionFactory::LongOption.new(option_template_library, token, token_iterator)
-      end
-    end
-
-    #def token_type(token)
-      #:long_option
-    #end
   end
 end

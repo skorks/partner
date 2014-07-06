@@ -2,6 +2,8 @@ require 'partner/token_iterator'
 require 'partner/token_classifier'
 require 'partner/option_parser_result'
 require 'partner/option'
+require 'partner/option_template_finder_factory'
+require 'partner/option_factory_builder'
 
 module Partner
   class OptionParser
@@ -19,14 +21,15 @@ module Partner
 
       token_iterator = TokenIterator.new(tokens)
       while token = token_iterator.next do
-        token_classifier = TokenClassifier.new(option_template_library)
-        if token_classifier.terminator_token?(token)
+        token_classifier = TokenClassifier.new(token)
+        if token_classifier.terminator?
           result.add_leftovers(token_iterator.remaining)
           break
-        elsif token_classifier.option_token?(token)
-          option_factory = token_classifier.option_factory_for(token, token_iterator)
-          option = option_factory.build
-          result.add_option(option)
+        elsif token_classifier.option?
+          finder = OptionTemplateFinderFactory.new(option_template_library).build(token_classifier)
+          option_factory_builder = OptionFactoryBuilder.new(finder, token_classifier)
+          option_factory = option_factory_builder.build(token)
+          result.add_option(option_factory.build(token_iterator))
         else
           result.add_leftover(token)
         end
