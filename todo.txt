@@ -1,8 +1,48 @@
-- get rspec configured
-- make sure we can execute a basic spec
-
 long option with string value
-  - an option we recognise was passed and it had a value
-    - it should end up in the options list
-  - an option we recognise was passed in but it didn't have value
-  - an option was passed in but not one we recognise
+  - an option we recognise was passed and it had a value                        DONE
+    - it should end up in the options list                                      DONE
+    - result should indicate that it was given on the command line              DONE
+  - an option we recognise was passed in but it didn't have value               DONE
+  - an option was passed in but not one we recognise                            DONE
+  - an option was not passed in but has default                                 DONE
+    - should be present in the final option list with default value             DONE
+    - the result should indicate that it was not passed in on the command line  DONE
+
+short options with string value
+
+long option with boolean value
+
+long options with boolean value
+
+negated long option (boolean value)
+
+combined short options
+
+multi value short option
+
+multi value long option
+
+short option with value separated by equals
+
+long option with value separated by equals
+
+short option with value in single or double quotes
+
+long option with value in single or double quotes
+
+token -- by itself ends option processing
+
+value is array
+value is hash
+value is not a string (int, float)
+
+
+
+
+
+* Extract building the options with default values from the options parser
+
+
+thoughts
+---------
+the concept of a value source for options and priority for value sources to facilitate injecting config file defaults easily

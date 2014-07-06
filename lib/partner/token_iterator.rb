@@ -9,6 +9,7 @@ module Partner
 
     def next
       tokens[@current_index].tap do |token|
+        ::Partner.logger.debug "#{self.class.name} fetching next token: #{token}"
         @current_index += 1
       end
     end

@@ -1,22 +1,12 @@
-require 'partner/option_template'
-
 module Partner
   class Configuration
-    attr_reader :options
-
-    def initialize
-      @options = {}
+    def initialize(option_template_library)
+      @option_template_library = option_template_library
     end
 
     def option(canonical_name, options = {})
-      add_option(canonical_name.to_sym, options)
+      @option_template_library.add(canonical_name, options)
       self
-    end
-
-    private
-
-    def add_option(canonical_name_sym, options)
-      @options[canonical_name_sym] = OptionTemplate.new(canonical_name_sym, options)
     end
   end
 end

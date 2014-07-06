@@ -1,4 +1,5 @@
 require "partner/version"
+require "partner/option_template_library"
 require "partner/configuration"
 require "partner/parser"
 require "logger"
@@ -6,9 +7,10 @@ require "logger"
 module Partner
   class << self
     def configure(&block)
-      config = Configuration.new
+      option_template_library = OptionTemplateLibrary.new
+      config = Configuration.new(option_template_library)
       yield(config)
-      Parser.new(config)
+      Parser.new(option_template_library)
     end
 
     def logger
