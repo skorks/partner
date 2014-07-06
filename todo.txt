@@ -48,19 +48,35 @@ multi value short option                                            DONE
 
 multi value long option                                             DONE
 
+short option with value in single or double quotes                  DONE
+
+long option with value in single or double quotes                   DONE
+
+token -- by itself ends option processing                           DONE
+
+
 short option with value separated by equals
+  - value not in quotes
+  - value in singel or double quotes
 
 long option with value separated by equals
+  - value not in quotes
+  - value in singel or double quotes
 
-short option with value in single or double quotes
+type is an integer
 
-long option with value in single or double quotes
+type is a double
 
-token -- by itself ends option processing                                  DONE
+multi value has an item type of integer
+
+multi value has an item type of double
+
+can configure a command
+  - can configure options for command
+
 
 less important or implement later
 ----------------------------------
-value is not a string (int, float)
 value is array
 value is hash
 

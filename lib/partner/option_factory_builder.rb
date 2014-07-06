@@ -29,7 +29,7 @@ module Partner
     def ensure_only_boolean_options_can_be_negated(token, template)
       if token_classifier.negated_long_option? && template.type != :boolean
         # TODO better error
-        raise "#{token} is not a boolean option, you can only negate boolean option"
+        raise "#{token} is not a boolean option, you can only negate boolean options"
       end
     end
   end
