@@ -19,8 +19,12 @@ module Partner
       end
     end
 
-    def add_lefover(leftover)
+    def add_leftover(leftover)
       @leftovers << leftover
+    end
+
+    def add_leftovers(leftovers)
+      @leftovers + [leftovers].flatten
     end
   end
 end

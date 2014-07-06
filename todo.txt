@@ -7,16 +7,32 @@ long option with string value
   - an option was not passed in but has default                                 DONE
     - should be present in the final option list with default value             DONE
     - the result should indicate that it was not passed in on the command line  DONE
+  - configured to have different value to the canonical name
+    - must ensure starts with -- if not already
+    - if starts with single dash, that's an error
+    - must have only dashes and small letters in it
 
 short options with string value
+  - configuration
+    - default case, it is just the one char
+    - can be 1 or 2 chars
+    - if two chars first char must be -
+    - second char (or first if one char) must be small letter, capital letter or number
+    - must not conflict with existing short name
 
 long option with boolean value
+  - no default given should default to false                        DONE
+  - passed on the command                                           DONE
+    - should be in the given list                                   DONE
+    - should have a value of true                                   DONE
+  - default value given should default to that default value        DONE
+  - non-boolean default value given, should error                   DONE
 
-long options with boolean value
+short option with boolean value                                     DONE
 
 negated long option (boolean value)
 
-combined short options
+combined short options (-xyz)
 
 multi value short option
 
@@ -30,11 +46,13 @@ short option with value in single or double quotes
 
 long option with value in single or double quotes
 
-token -- by itself ends option processing
+token -- by itself ends option processing                                  DONE
 
+less important or implement later
+----------------------------------
+value is not a string (int, float)
 value is array
 value is hash
-value is not a string (int, float)
 
 
 

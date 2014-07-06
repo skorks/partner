@@ -9,12 +9,14 @@ module Partner
     end
 
     def add_value(token, token_iterator)
-      @value = token_iterator.next
-      @given = true
-      unless @value
-        # TODO raise appropriate error
-        raise "No value found for option: #{token}"
+      if template.type == :boolean
+        @value = true
+      else
+        @value = token_iterator.next
       end
+      @given = true
+      # TODO raise appropriate error
+      raise "No value found for option: #{token}" unless @value
       self
     end
 

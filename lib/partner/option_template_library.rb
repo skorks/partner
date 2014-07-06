@@ -29,5 +29,9 @@ module Partner
     def find_by_long_name(name)
       by_long_name[name]
     end
+
+    def find_by_short_name(name)
+      by_short_name[name]
+    end
   end
 end

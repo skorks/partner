@@ -20,7 +20,10 @@ module Partner
       token_iterator = TokenIterator.new(tokens)
       while token = token_iterator.next do
         token_classifier = TokenClassifier.new(option_template_library)
-        if token_classifier.option_token?(token)
+        if token_classifier.terminator_token?(token)
+          result.add_leftovers(token_iterator.remaining)
+          break
+        elsif token_classifier.option_token?(token)
           option_factory = token_classifier.option_factory_for(token, token_iterator)
           option = option_factory.build
           result.add_option(option)
@@ -38,7 +41,7 @@ module Partner
     def options_with_default_values
       options = []
       option_template_library.each do |option_template|
-        if option_template.default_value
+        if option_template.default_value != nil
           options << ::Partner::Option.new(option_template)
         end
       end

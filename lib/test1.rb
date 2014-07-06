@@ -3,8 +3,11 @@ require 'partner'
 # ruby -Ilib lib/test1.rb --foo
 
 parser = Partner.configure do |config|
-  config.option :foo
+  config.option :foo, short: '-f'
   config.option :foo2, default: 'hello'
+  config.option :myflag, type: :boolean, short: '-m'
+  config.option :myflag2, type: :boolean, default: true
+  #config.option :myflag3, type: :boolean, default: "BALH"
   #config.option :foo, desc: 'Foo option'                   # type is string, default value is nil
   #config.option :bar, desc: 'Bar options', type: :boolean  # type is boolean, default value is false
   #config.option :baz, type: :int                           # type is int, default value is zero

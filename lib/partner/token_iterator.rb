@@ -13,5 +13,9 @@ module Partner
         @current_index += 1
       end
     end
+
+    def remaining
+      tokens[@current_index..tokens.size]
+    end
   end
 end
