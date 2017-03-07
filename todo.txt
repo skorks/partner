@@ -90,3 +90,33 @@ value is hash
 thoughts
 ---------
 the concept of a value source for options and priority for value sources to facilitate injecting config file defaults easily
+
+require 'shellwords'
+
+argv = Shellwords.split('three blind "mice"')
+
+feature list
+-------------
+- when options is parsed a provided lambda is called and given the parsed value for the option
+- when an unexpected options is given, writes an error and exits
+- double dash followed by string should be considered a single option
+- single dash followed by char should be considered a single option
+- single dash followed by string should be considered multiple boolean options
+- options that take an argument error unless they are given one
+- flags that don't take arguments ignore them
+- flags that require arguments of a given type, refuse arguments of other types
+- flags that have a default value, can derive a type from that value
+- type and default value must match
+- short names can be derived automatically unless given
+- two args can't have the same short
+- two args can't have the same long
+- switches can be negated with --no-
+- double dash ends options processing
+- options can be specified multiple times if they are a list option
+- boolean options can not be list types
+- when long names are auto generated they convert underscores to dashes
+- options can be marked as conflicting and can't be specified together
+- options can be marked as dependent and must be specified together
+- options can be marked as required and must be provided
+- argument values can have spaces if wrapped in quotes single or double
+- argument value can be separated from switch using space or using = without spaces
