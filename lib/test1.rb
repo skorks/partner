@@ -175,7 +175,6 @@ require "shellwords"
 # }
 
 # long_options - longer than 2 chars, starts with --, does not start with --no-,
-args1 = Shellwords.split(%Q(--foo 123 --cleg 'brown fox' -b --c x -spq --no-bar --baz=hello --cred="world"))
 
 
 def terminator?(token)
@@ -212,7 +211,6 @@ def normalize_args(args)
 end
 
 
-normalized_args = normalize_args(args1)
 
 class OptionUtils
   class << self
@@ -223,6 +221,10 @@ class OptionUtils
 
     def negated_long_name_from_long_name(long_name)
       long_name.sub("--", "--no-")
+    end
+
+    def long_name_from_negated_long_name(negated_long_name)
+      negated_long_name.sub("--no-", "--")
     end
   end
 end
@@ -245,8 +247,8 @@ class Option
     @long = long
   end
 
-  def flag?
-    type == :boolean
+  def requires_argument?
+    type != :boolean
   end
 end
 
@@ -272,49 +274,84 @@ class Config
   end
 end
 
+class TokenIterator
+  attr_reader :args
+
+  def initialize(args:)
+    @args = args
+    @next_token_position = 0
+  end
+
+  def next
+    token = args[@next_token_position]
+    @next_token_position += 1
+    token
+  end
+
+  def has_next?
+    @next_token_position < args.length
+  end
+end
+
+class Result
+  def initialize
+    @given_options = {}
+    @arguments = []
+  end
+
+  def add_option(option_instance:, token_iterator:)
+    if option_instance
+      if option_instance.requires_argument?
+        @given_options[option_instance.canonical_name] = token_iterator.next
+      else
+        @given_options[option_instance.canonical_name] = true
+      end
+    end
+  end
+
+  def add_negated_boolean_option(option_instance:)
+    if option_instance
+      @given_options[option_instance.canonical_name] = false
+    end
+  end
+
+  def add_argument(value:)
+    @arguments << value
+  end
+end
+
 config = Config.new
 config.add_option(Option.build(canonical_name: :foo, type: :string))
 config.add_option(Option.build(canonical_name: :bob, type: :boolean, short: "-b"))
+config.add_option(Option.build(canonical_name: :bar, type: :boolean))
+
+args1 = Shellwords.split(%Q(--foo 123 --cleg 'brown fox' -b --c x -spq --no-bar --baz=hello --cred="world" -- blah yadda))
+normalized_args = normalize_args(args1)
 
 p normalized_args
 
-given_options = {}
-arguments = []
-next_token_position = 0
-(0...normalized_args.length).each do |index|
-  next_token_position += 1
-  token = normalized_args[index]
+result = Result.new
+token_iterator = TokenIterator.new(args: normalized_args)
+
+while token_iterator.has_next?
+  token = token_iterator.next
   if terminator?(token)
     break
   elsif long_option?(token)
     option = config.find_option_by_long(token)
-    if option
-      if option.flag?
-        given_options[option.canonical_name] = true
-      else
-        given_options[option.canonical_name] = normalized_args[index + 1]
-        # skip the next token
-      end
-      p option
-    end
+    result.add_option(option_instance: option, token_iterator: token_iterator)
   elsif negated_long_option?(token)
+    option = config.find_option_by_long(OptionUtils.long_name_from_negated_long_name(token))
+    result.add_negated_boolean_option(option_instance: option)
   elsif short_option?(token)
     option = config.find_option_by_short(token)
-    if option
-      if option.flag?
-        given_options[option.canonical_name] = true
-      else
-        given_options[option.canonical_name] = normalized_args[index + 1]
-        # skip the next token
-      end
-      p option
-    end
+    result.add_option(option_instance: option, token_iterator: token_iterator)
   end
 end
-start_position = next_token_position
-(start_position...normalized_args.length).each do |index|
-  next_token_position += 1
-  arguments << normalized_args[index]
+while token_iterator.has_next?
+  result.add_argument(value: token_iterator.next)
 end
-p given_options
-p arguments
+
+# handle combined short options vs short option with value without space
+
+p result
