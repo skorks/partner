@@ -55,81 +55,6 @@ class TokenIterator
   end
 end
 
-class TokenClassifier
-  # attr_reader :token_iterator
-  #
-  # def initialize(token_iterator = nil)
-  #   @token_iterator = token_iterator
-  # end
-
-  TOKEN_TYPES = {
-    terminator: :terminator?,
-    long_option: :long_option?,
-    short_option: :short_option?,
-    option_value: :option_value?,
-  }
-
-  def classify(token)
-    TOKEN_TYPES.each do |token_type, predicate_method|
-      return token_type if send(predicate_method)
-    end
-    return :unknown
-  end
-
-  def terminator?(token)
-    token == "--"
-  end
-
-  def long_option?(token)
-    token.start_with?("--") && !token.start_with?("--no-") && !terminator?
-  end
-
-  def short_option?(token)
-    token.start_with?("-") && token.length == 2 && !terminator?
-  end
-
-  def option_value?(token)
-    token_object = tokenization_context.previous_token
-    token_object.option? && token_object.takes_value? && !option?(token)
-    # previous token is an option which can take a value
-    # tokenization_context.
-  end
-
-  # def option?
-  #   if short_option? ||
-  #     long_option? ||
-  #     negated_long_option? ||
-  #     combined_short_options?
-  #     true
-  #   else
-  #     false
-  #   end
-  # end
-  #
-  # def combined_short_options?
-  #   token.start_with?('-') &&
-  #     !token.start_with?('--') &&
-  #     token.length > 2
-  # end
-  #
-  # def short_option?
-  #   token.start_with?('-') &&
-  #     token.length == 2 &&
-  #     !token.start_with?('--')
-  # end
-  #
-  # def long_option?
-  #   token.start_with?('--') && !token.start_with?('--no-') && !terminator?
-  # end
-  #
-  # def negated_long_option?
-  #   token.start_with?('--no-')
-  # end
-  #
-  # def terminator?
-  #   token == '--'
-  # end
-end
 
 #concepts
 #----------------
@@ -175,40 +100,6 @@ require "shellwords"
 # }
 
 # long_options - longer than 2 chars, starts with --, does not start with --no-,
-
-
-def terminator?(token)
-  token == "--"
-end
-
-def long_option?(token)
-  token.start_with?("--") && !token.start_with?("--no-") && !terminator?(token)
-end
-
-def short_option?(token)
-  token.start_with?("-") && token.length == 2 && !terminator?(token)
-end
-
-def combined_short_options?(token)
-  token.start_with?('-') && !token.start_with?('--') && token.length > 2
-end
-
-def negated_long_option?(token)
-  token.start_with?('--no-')
-end
-
-def normalize_args(args)
-  normalized_args = []
-  args.each do |arg|
-    if combined_short_options?(arg)
-      short_options = arg[1, arg.length].split("").map{|v| "-#{v}"}
-      normalized_args += short_options
-    else
-      normalized_args += arg.split("=")
-    end
-  end
-  normalized_args
-end
 
 
 
@@ -299,20 +190,8 @@ class Result
     @arguments = []
   end
 
-  def add_option(option_instance:, token_iterator:)
-    if option_instance
-      if option_instance.requires_argument?
-        @given_options[option_instance.canonical_name] = token_iterator.next
-      else
-        @given_options[option_instance.canonical_name] = true
-      end
-    end
-  end
-
-  def add_negated_boolean_option(option_instance:)
-    if option_instance
-      @given_options[option_instance.canonical_name] = false
-    end
+  def add_option(canonical_name:, value:)
+    @given_options[canonical_name] = value
   end
 
   def add_argument(value:)
@@ -320,38 +199,262 @@ class Result
   end
 end
 
+class TokenProcessor
+  attr_reader :parsing_context
+
+  def initialize(parsing_context:)
+    @parsing_context = parsing_context
+  end
+
+  def process(token)
+    false
+  end
+end
+
+class ArgumentTokenProcessor < TokenProcessor
+  def process(token)
+    parsing_context.result.add_argument(value: token)
+    true
+  end
+end
+
+class TerminatorTokenProcessor < TokenProcessor
+  def process(token)
+    if can_process?(token)
+      parsing_context.lock_token_type(token_processor_class: ArgumentTokenProcessor)
+      true
+    else
+      false
+    end
+  end
+
+  def can_process?(token)
+    token == "--"
+  end
+end
+
+class LongOptionTokenProcessor < TokenProcessor
+  def process(token)
+    if can_process?(token)
+      option_instance = parsing_context.config.find_option_by_long(token)
+
+      if option_instance
+        if option_instance.requires_argument?
+          if parsing_context.token_iterator.has_next?
+            parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: parsing_context.token_iterator.next)
+          else
+            # this means input is invalid and should be handled appropriately e.g. raise error
+          end
+        else
+          parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: true)
+        end
+        true
+      else
+        # this means input is invalid and should be handled appropriately e.g. raise error
+      end
+    else
+      false
+    end
+  end
+
+  def can_process?(token)
+    token.start_with?("--") &&
+    !token.start_with?("--no-") &&
+    !TerminatorTokenProcessor.new(parsing_context: parsing_context).can_process?(token)
+  end
+end
+
+class ShortOptionTokenProcessor < TokenProcessor
+  def process(token)
+    if can_process?(token)
+      option_instance = parsing_context.config.find_option_by_short(token)
+
+      if option_instance
+        if option_instance.requires_argument?
+          if parsing_context.token_iterator.has_next?
+            parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: parsing_context.token_iterator.next)
+          else
+            # this means input is invalid and should be handled appropriately e.g. raise error
+          end
+        else
+          parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: true)
+        end
+        true
+      else
+        # this means input is invalid and should be handled appropriately e.g. raise error
+      end
+    else
+      false
+    end
+  end
+
+  def can_process?(token)
+    token.start_with?("-") &&
+    token.length == 2 &&
+    !TerminatorTokenProcessor.new(parsing_context: parsing_context).can_process?(token)
+  end
+end
+
+class NegatedLongOptionTokenProcessor < TokenProcessor
+  def process(token)
+    if can_process?(token)
+      option_instance = parsing_context.config.find_option_by_long(OptionUtils.long_name_from_negated_long_name(token))
+
+      if option_instance
+        parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: false)
+        true
+      else
+        # this means input is invalid and should be handled appropriately e.g. raise error
+      end
+    else
+      false
+    end
+  end
+
+  def can_process?(token)
+    token.start_with?('--no-')
+  end
+end
+
+class ParsingContext
+  attr_reader :config, :result, :token_iterator
+  attr_reader :locked_token_processor_class
+
+  def initialize(config:, result:, token_iterator:)
+    @config = config
+    @result = result
+    @token_iterator = token_iterator
+    @locked_token_processor_class = nil
+  end
+
+  def lock_token_type(token_processor_class:)
+    @locked_token_processor_class = token_processor_class
+  end
+
+  def token_type_locked?
+    locked_token_processor_class != nil
+  end
+end
+
+class Parser
+  attr_reader :config
+
+  def initialize(config:)
+    @config = config
+  end
+
+  def parse(args)
+    p args
+    result = Result.new
+    token_iterator = TokenIterator.new(args: args)
+    parsing_context = ParsingContext.new(config: config, result: result, token_iterator: token_iterator)
+
+    while token_iterator.has_next?
+      token = token_iterator.next
+      [
+        TerminatorTokenProcessor,
+        LongOptionTokenProcessor,
+        ShortOptionTokenProcessor,
+        NegatedLongOptionTokenProcessor,
+
+        # ShortOptionWithValueTokenProcessor,
+        # CombinedShortOptionsTokenProcessor,
+        # LongOptionWithValueViaEqualsTokenProcessor,
+        # ShortOptionWithValueViaEqualsTokenProcessor,
+        # CommandWordTokenProcessor,
+        # ArgumentTokenProcessor # must be last to slurp up any tokens which we couldn't classify before
+      ].each do |token_processor_class|
+        if parsing_context.token_type_locked?
+          token_processor = parsing_context.locked_token_processor_class.new(parsing_context: parsing_context)
+        else
+          token_processor = token_processor_class.new(parsing_context: parsing_context)
+        end
+        break if token_processor.process(token)
+      end
+    end
+
+    # while token_iterator.has_next?
+    #   token = token_iterator.next
+    #   if terminator?(token)
+    #     break
+    #   elsif long_option?(token)
+    #     option = config.find_option_by_long(token)
+    #     result.add_option(option_instance: option, token_iterator: token_iterator)
+    #   elsif negated_long_option?(token)
+    #     option = config.find_option_by_long(OptionUtils.long_name_from_negated_long_name(token))
+    #     result.add_negated_boolean_option(option_instance: option)
+    #   elsif short_option?(token)
+    #     option = config.find_option_by_short(token)
+    #     result.add_option(option_instance: option, token_iterator: token_iterator)
+    #   end
+    # end
+    # while token_iterator.has_next?
+    #   result.add_argument(value: token_iterator.next)
+    # end
+
+    result
+  end
+
+  private
+
+  # def normalize_args(args)
+  #   normalized_args = []
+  #   args.each do |arg|
+  #     if combined_short_options?(arg)
+  #       short_options = arg[1, arg.length].split("").map{|v| "-#{v}"}
+  #       normalized_args += short_options
+  #     else
+  #       normalized_args += arg.split("=")
+  #     end
+  #   end
+  #   normalized_args
+  # end
+end
+
+# class TokenClassifier
+#   TOKEN_TYPES = {
+#     terminator: :terminator?,
+#     long_option: :long_option?,
+#     short_option: :short_option?,
+#     negated_long_option: :negated_long_option?,
+#   }
+#
+#   def classify(token)
+#     TOKEN_TYPES.each do |token_type, predicate_method|
+#       return token_type if send(predicate_method, token)
+#     end
+#     return :unknown
+#   end
+#
+#   def terminator?(token)
+#     token == "--"
+#   end
+#
+#   def long_option?(token)
+#     token.start_with?("--") && !token.start_with?("--no-") && !terminator?(token)
+#   end
+#
+#   def short_option?(token)
+#     token.start_with?("-") && token.length == 2 && !terminator?(token)
+#   end
+#
+#   def combined_short_options?(token)
+#     token.start_with?('-') && !token.start_with?('--') && token.length > 2
+#   end
+#
+#   def negated_long_option?(token)
+#     token.start_with?('--no-')
+#   end
+# end
+
+
 config = Config.new
 config.add_option(Option.build(canonical_name: :foo, type: :string))
 config.add_option(Option.build(canonical_name: :bob, type: :boolean, short: "-b"))
 config.add_option(Option.build(canonical_name: :bar, type: :boolean))
 
-args1 = Shellwords.split(%Q(--foo 123 --cleg 'brown fox' -b --c x -spq --no-bar --baz=hello --cred="world" -- blah yadda))
-normalized_args = normalize_args(args1)
-
-p normalized_args
-
-result = Result.new
-token_iterator = TokenIterator.new(args: normalized_args)
-
-while token_iterator.has_next?
-  token = token_iterator.next
-  if terminator?(token)
-    break
-  elsif long_option?(token)
-    option = config.find_option_by_long(token)
-    result.add_option(option_instance: option, token_iterator: token_iterator)
-  elsif negated_long_option?(token)
-    option = config.find_option_by_long(OptionUtils.long_name_from_negated_long_name(token))
-    result.add_negated_boolean_option(option_instance: option)
-  elsif short_option?(token)
-    option = config.find_option_by_short(token)
-    result.add_option(option_instance: option, token_iterator: token_iterator)
-  end
-end
-while token_iterator.has_next?
-  result.add_argument(value: token_iterator.next)
-end
+args = Shellwords.split(%Q(--foo 123 --cleg 'brown fox' -b --c x -spq --no-bar --baz=hello --cred="world" -- blah yadda))
+result = Parser.new(config: config).parse(args)
+p result
 
 # handle combined short options vs short option with value without space
-
-p result
