@@ -128,8 +128,8 @@ feature list
 - support required options
 - support dependant options
 - support conflicting options
-- make sure we error out correctly when erroneous conditions occur (e.g. unknown option etc )
-- support more different option types (integer, float) and allow casting correctly
+- make sure we error out correctly when erroneous conditions occur (e.g. unknown option etc )      DONE
+- support more different option types (integer, float) and allow casting correctly                 DONE
 - get some logging happening and allow a logger to be configurable
 - figure out a way to supply syntax definitions which can be mapped to out configuration objects
 - try to actually create a couple of different syntax definitions with mappings to configurations objects
@@ -139,6 +139,17 @@ feature list
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate
 - type and default value must match
 - long, short and canonical names can't conflict
+- make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format)
+
+- should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
+- should we be able to suppress errors?????
+- what about some way to print out some basic usage for the command line app
+- ability for user to define their own custom types similar to how slop does it
+- ability for the user to define custom pre parsing steps
+- ability for the user to define custom post parsing steps
+- ability for the user to define their own custom types of tokens with a matcher and a processor for fully custom behaviour
+- aliases for options, so they can be known by multiple names
+- single hyphen prefix for long options ???
 
 - audit trollop tests to make sure we can do everything that trollop can do as well
 - write a bunch of lower level unit tests to ensure non-breakiness of specific classes
