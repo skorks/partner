@@ -1,21 +1,20 @@
 module Partner
   class TokenIterator
-    attr_reader :tokens
+    attr_reader :args
 
-    def initialize(tokens = [])
-      @tokens = tokens || []
-      @current_index = 0
+    def initialize(args:)
+      @args = args
+      @next_token_position = 0
     end
 
     def next
-      tokens[@current_index].tap do |token|
-        ::Partner.logger.debug "#{self.class.name} fetching next token: #{token}"
-        @current_index += 1
-      end
+      token = args[@next_token_position]
+      @next_token_position += 1
+      token
     end
 
-    def remaining
-      tokens[@current_index..tokens.size]
+    def has_next?
+      @next_token_position < args.length
     end
   end
 end
