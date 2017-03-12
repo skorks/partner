@@ -120,3 +120,27 @@ feature list
 - options can be marked as required and must be provided
 - argument values can have spaces if wrapped in quotes single or double
 - argument value can be separated from switch using space or using = without spaces
+
+
+- support options that can be specified multiple times and their values should be bundled into a list
+- implement command support
+- make sure default values are taken into account during parsing (pre parsing)
+- support required options
+- support dependant options
+- support conflicting options
+- make sure we error out correctly when erroneous conditions occur (e.g. unknown option etc )
+- support more different option types (integer, float) and allow casting correctly
+- get some logging happening and allow a logger to be configurable
+- figure out a way to supply syntax definitions which can be mapped to out configuration objects
+- try to actually create a couple of different syntax definitions with mappings to configurations objects
+- support generating long option name from canonical name for options before parsing
+- support generating short options name from canonical name and other options before parsing
+- support deriving type from the default value before parsing for all options
+- write a whole bunch of high level tests to make sure all the functionality works as appropriate
+- type and default value must match
+- long, short and canonical names can't conflict
+
+- audit trollop tests to make sure we can do everything that trollop can do as well
+- write a bunch of lower level unit tests to ensure non-breakiness of specific classes
+- implement defining argument types and argument checking after parsing is done
+- implement ability to prompt for value of an option ???

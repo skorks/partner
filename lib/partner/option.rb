@@ -1,10 +1,11 @@
 require "partner/option_utils"
+require "partner/option_types"
 
 module Partner
   class Option
     class << self
       def build(canonical_name:, type: nil, short: nil, long: nil)
-        type ||= :boolean
+        type = OptionTypes.new.find_type(type) || OptionTypes::BooleanType.new
         long ||= OptionUtils.long_name_from_canonical_name(canonical_name)
         new(canonical_name, type, short, long)
       end
@@ -20,7 +21,7 @@ module Partner
     end
 
     def requires_argument?
-      type != :boolean
+      type.requires_argument?
     end
   end
 end

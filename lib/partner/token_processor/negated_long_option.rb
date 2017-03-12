@@ -9,7 +9,7 @@ module Partner
         if option_instance
           parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: false)
         else
-          # this means input is invalid and should be handled appropriately e.g. raise error
+          raise Error::UnknownOptionError.new(token)
         end
       end
     end

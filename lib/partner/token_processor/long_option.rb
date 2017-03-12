@@ -11,13 +11,13 @@ module Partner
             if parsing_context.token_iterator.has_next?
               parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: parsing_context.token_iterator.next)
             else
-              # this means input is invalid and should be handled appropriately e.g. raise error
+              raise Error::MissingOptionArgumentError.new(token)
             end
           else
             parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: true)
           end
         else
-          # this means input is invalid and should be handled appropriately e.g. raise error
+          raise Error::UnknownOptionError.new(token)
         end
       end
     end
