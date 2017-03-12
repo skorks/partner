@@ -122,7 +122,7 @@ feature list
 - argument value can be separated from switch using space or using = without spaces
 
 
-- support options that can be specified multiple times and their values should be bundled into a list
+- support options that can be specified multiple times and their values should be bundled into a list DONE
 - implement command support
 - make sure default values are taken into account during parsing (pre parsing)
 - support required options

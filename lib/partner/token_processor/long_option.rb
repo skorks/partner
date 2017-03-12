@@ -6,18 +6,14 @@ module Partner
       def process(token)
         option_instance = parsing_context.config.find_option_by_long(token)
 
-        if option_instance
-          if option_instance.requires_argument?
-            if parsing_context.token_iterator.has_next?
-              parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: parsing_context.token_iterator.next)
-            else
-              raise Error::MissingOptionArgumentError.new(token)
-            end
-          else
-            parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: true)
-          end
+        raise Error::UnknownOptionError.new(token) unless option_instance
+        raise Error::MissingOptionArgumentError.new(token) if option_instance.requires_argument? && !parsing_context.token_iterator.has_next?
+
+        if option_instance.requires_argument?
+          value = parsing_context.token_iterator.next
+          parsing_context.result.add_option(option_instance: option_instance, value: value)
         else
-          raise Error::UnknownOptionError.new(token)
+          parsing_context.result.add_option(option_instance: option_instance, value: true)
         end
       end
     end

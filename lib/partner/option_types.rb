@@ -15,9 +15,24 @@ module Partner
           return type_instance
         end
       end
+      nil
     end
 
-    class BooleanType
+    class BaseType
+      def to_s
+        raise "Not implemented"
+      end
+
+      def requires_argument?
+        true
+      end
+
+      def value_wrapper
+        self::class::Value.new
+      end
+    end
+
+    class BooleanType < BaseType
       def to_s
         "boolean"
       end
@@ -26,56 +41,74 @@ module Partner
         false
       end
 
-      def cast_value(value)
-        !!value
+      class Value
+        attr_reader :raw
+
+        def initialize
+          @raw = nil
+        end
+
+        def update(value)
+          @raw = !!value
+        end
       end
     end
 
-    class StringType
+    class StringType < BaseType
       def to_s
         "string"
       end
 
-      def requires_argument?
-        true
-      end
+      class Value
+        attr_reader :raw
 
-      def cast_value(value)
-        value.to_s
+        def initialize
+          @raw = nil
+        end
+
+        def update(value)
+          @raw = value.to_s
+        end
       end
     end
 
-    class IntegerType
+    class IntegerType < BaseType
       def to_s
         "integer"
       end
 
-      def requires_argument?
-        true
-      end
+      class Value
+        attr_reader :raw
 
-      def cast_value(value)
-        # TODO perhaps this should blow up if can't cast
-        value.to_i
+        def initialize
+          @raw = nil
+        end
+
+        def update(value)
+          @raw = value.to_i
+        end
       end
     end
 
-    class FloatType
+    class FloatType < BaseType
       def to_s
         "float"
       end
 
-      def requires_argument?
-        true
-      end
+      class Value
+        attr_reader :raw
 
-      def cast_value(value)
-        # TODO perhaps this should blow up if can't cast
-        BigDecimal.new(value)
+        def initialize
+          @raw = nil
+        end
+
+        def update(value)
+          @raw = BigDecimal.new(value)
+        end
       end
     end
 
-    class ArrayType
+    class ArrayType < BaseType
       def initialize(item_type: StringType)
         @item_type = item_type
       end
@@ -84,13 +117,25 @@ module Partner
         "array[#{@item_type.new.to_s}]"
       end
 
-      def requires_argument?
-        true
+      def value_wrapper
+        self::class::Value.new(item_type: @item_type)
       end
 
-      def cast_value(value)
-        [value].flatten.map do |item|
-          @item_type.new.cast_value(item)
+      class Value
+        attr_reader :raw
+
+        def initialize(item_type:)
+          @raw = []
+          @item_type = item_type
+        end
+
+        # TODO maybe make it so delimiter can be configurable
+        def update(value)
+          value.split(",").each do |item|
+            wrapped_value = @item_type::Value.new
+            wrapped_value.update(item)
+            @raw << wrapped_value.raw
+          end
         end
       end
     end

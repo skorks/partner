@@ -6,7 +6,7 @@ module Partner
       def process(token)
         split_into_short_options(token).each do |short_option_token|
           option_instance = parsing_context.config.find_option_by_short(short_option_token)
-          parsing_context.result.add_option(canonical_name: option_instance.canonical_name, value: true)
+          parsing_context.result.add_option(option_instance: option_instance, value: true)
         end
       end
 
