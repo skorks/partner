@@ -35,6 +35,12 @@ module Partner
 
     class PreParsingPhase < BasePhase
       def execute
+        # UpdateResultWithDefaultOptionValues
+        # DeriveOptionTypesFromDefaultValues
+        # EnsureNoCanonicalOptionNameConflicts
+        # EnsureNoLongOptionNameConflicts
+        # EnsureNoShortOptionNameConflicts
+        # GenerateShortNamesForOptions
       end
     end
 
@@ -58,6 +64,9 @@ module Partner
 
     class PostParsingPhase < BasePhase
       def execute
+        # EnsureRequiredOptionsGiven
+        # EnsureDependenciesSatisfied
+        # EnsureNoConflicts
       end
     end
   end
