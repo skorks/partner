@@ -1,26 +1,30 @@
-require 'partner'
+require "shellwords"
+require "partner"
 
-# ruby -Ilib lib/test1.rb --foo
+config = Partner::Config.new
+config.add_option(Partner::Option.build(canonical_name: :foo, type: "integer"))
+config.add_option(Partner::Option.build(canonical_name: :bob, type: "boolean", short: "-b"))
+config.add_option(Partner::Option.build(canonical_name: :bar, type: "boolean"))
+config.add_option(Partner::Option.build(canonical_name: :combi, type: "string", short: "-m"))
+config.add_option(Partner::Option.build(canonical_name: :sss, type: "boolean", short: "-s"))
+config.add_option(Partner::Option.build(canonical_name: :ppp, type: "boolean", short: "-p"))
+config.add_option(Partner::Option.build(canonical_name: :qqq, type: "boolean", short: "-q"))
+config.add_option(Partner::Option.build(canonical_name: :baz, type: "string"))
+config.add_option(Partner::Option.build(canonical_name: :abc, type: "array[string]"))
+config.add_option(Partner::Option.build(canonical_name: :def, type: "array[integer]"))
+config.add_option(Partner::Option.build(canonical_name: :cleg, type: "string"))
+config.add_option(Partner::Option.build(canonical_name: :c, type: "string"))
+config.add_option(Partner::Option.build(canonical_name: :cred, type: "string"))
+config.add_command("tooty fruity")
+config.add_command("feet\n")
+config.add_command("feet are   really great")
 
-parser = Partner.configure do |config|
-  config.option :foo, short: 'f', long: '--foo'
-  config.option :foo2, default: 'hello', short: '-2'
-  config.option :myflag, type: :boolean, short: '-m'
-  config.option :nyflag, type: :boolean, default: true, short: '-n'
-  config.option :ryflag, type: :boolean, short: '-r'
-  config.option :many, short: 'a', multi: true
-  #config.option :myflag3, type: :boolean, default: "BALH"
-  #config.option :foo, desc: 'Foo option'                   # type is string, default value is nil
-  #config.option :bar, desc: 'Bar options', type: :boolean  # type is boolean, default value is false
-  #config.option :baz, type: :int                           # type is int, default value is zero
+# p config.instance_variable_get("@valid_commands")
+# p config.instance_variable_get("@command_tree")
 
-  #config.command('hello world') do |command|
-    #command.option :goo   # type is string, default value is nil
-  #end
-end
-result = parser.parse
-p result.options
-p result.given_options
-p result.default_options
-#result.command
-#result.arguments
+args = Shellwords.split(%Q(tooty --foo 123 --cleg 'brown fox' -mcake -b --c x fruity -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
+result = Partner::Parser.new(config: config).parse(args)
+# p result
+p result.option_values
+p result.command
+p result.arguments

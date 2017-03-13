@@ -1,37 +1,28 @@
+require "forwardable"
+require "partner/option_utils"
+require "partner/option_types"
+
 module Partner
   class Option
-    attr_reader :template
+    extend Forwardable
 
-    def initialize(template, value = nil, given = false)
-      @template = template
-      @potential_value = value
-      @value = nil
-      @given = given
-    end
-
-    def name
-      template.canonical_name
-    end
-
-    # the actual value can be false for boolean options so we need to have
-    # a clear distinction between a value that is false and on that's nil
-    def value
-      return @value if @value != nil
-      if @potential_value == nil
-        @value = template.default_value
-      elsif template.multi
-        @value = [@potential_value]
-      else
-        @value = @potential_value
+    class << self
+      def build(canonical_name:, type: nil, short: nil, long: nil)
+        type = OptionTypes.new.find_type(type) || OptionTypes::BooleanType.new
+        long ||= OptionUtils.long_name_from_canonical_name(canonical_name)
+        new(canonical_name, type, short, long)
       end
     end
 
-    def value=(value)
-      @value = value
-    end
+    attr_reader :canonical_name, :type, :short, :long
 
-    def given?
-      @given
+    def_delegators :type, :requires_argument?, :value_wrapper
+
+    def initialize(canonical_name, type, short, long)
+      @canonical_name = canonical_name
+      @type = type
+      @short = short
+      @long = long
     end
   end
 end
