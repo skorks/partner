@@ -16,9 +16,15 @@ config.add_option(Partner::Option.build(canonical_name: :cleg, type: "string"))
 config.add_option(Partner::Option.build(canonical_name: :c, type: "string"))
 config.add_option(Partner::Option.build(canonical_name: :cred, type: "string"))
 config.add_command("tooty fruity")
-config.add_command("feet")
+config.add_command("feet\n")
+config.add_command("feet are   really great")
 
-args = Shellwords.split(%Q(--foo 123 --cleg 'brown fox' -mcake -b --c x -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
+# p config.instance_variable_get("@valid_commands")
+# p config.instance_variable_get("@command_tree")
+
+args = Shellwords.split(%Q(tooty --foo 123 --cleg 'brown fox' -mcake -b --c x fruity -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
 result = Partner::Parser.new(config: config).parse(args)
-p result
+# p result
 p result.option_values
+p result.command
+p result.arguments

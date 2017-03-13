@@ -123,7 +123,7 @@ feature list
 
 
 - support options that can be specified multiple times and their values should be bundled into a list DONE
-- implement command support
+- implement command support                                                                           DONE
 - make sure default values are taken into account during parsing (pre parsing)
 - support required options
 - support dependant options

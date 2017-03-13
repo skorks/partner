@@ -1,4 +1,5 @@
 require "partner/token_processor/base"
+require "partner/error"
 
 module Partner
   module TokenProcessor

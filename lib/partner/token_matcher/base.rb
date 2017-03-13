@@ -1,10 +1,11 @@
 module Partner
   module TokenMatcher
     class Base
-      attr_reader :config
+      attr_reader :config, :result
 
-      def initialize(config:)
+      def initialize(config:, result:)
         @config = config
+        @result = result
       end
 
       def matches?(token)

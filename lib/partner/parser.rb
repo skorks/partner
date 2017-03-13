@@ -1,6 +1,7 @@
 require "partner/token_iterator"
 require "partner/parsing_context"
 require "partner/token_classifier"
+require "partner/error"
 
 module Partner
   class Parser
@@ -46,7 +47,7 @@ module Partner
 
     class ParsingPhase < BasePhase
       def execute
-        token_classifier = TokenClassifier.new(config: parsing_context.config)
+        token_classifier = TokenClassifier.new(config: parsing_context.config, result: parsing_context.result)
 
         while parsing_context.token_iterator.has_next?
           token = parsing_context.token_iterator.next
@@ -64,9 +65,26 @@ module Partner
 
     class PostParsingPhase < BasePhase
       def execute
+        [
+          EnsureCommandValid.new(parsing_context: parsing_context),
+        ].each(&:execute)
         # EnsureRequiredOptionsGiven
         # EnsureDependenciesSatisfied
         # EnsureNoConflicts
+      end
+
+      class EnsureCommandValid
+        attr_reader :parsing_context
+
+        def initialize(parsing_context:)
+          @parsing_context = parsing_context
+        end
+
+        def execute
+          unless parsing_context.config.valid_command?(parsing_context.result.command)
+            raise Error::InvalidCommandError.new(parsing_context.result.command)
+          end
+        end
       end
     end
   end

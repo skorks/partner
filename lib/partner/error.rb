@@ -11,5 +11,8 @@ module Partner
 
     class InvalidOptionArgumentError < InputError
     end
+
+    class InvalidCommandError < InputError
+    end
   end
 end

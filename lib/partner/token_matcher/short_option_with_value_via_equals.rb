@@ -7,7 +7,7 @@ module Partner
       def matches?(token)
         token.start_with?("-") &&
         token.length == 2 &&
-        !Terminator.new(config: config).matches?(token) &&
+        !Terminator.new(config: config, result: result).matches?(token) &&
         token.include?("=")
       end
     end
