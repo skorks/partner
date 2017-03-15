@@ -1,5 +1,7 @@
 module Partner
   class Result
+    attr_reader :arguments, :given_options, :command_word_list
+
     def initialize
       @given_options = {}
       @arguments = []
@@ -11,6 +13,11 @@ module Partner
       @option_values[option_instance.canonical_name] ||= option_instance.value_wrapper
       @option_values[option_instance.canonical_name].update(value)
       @given_options[option_instance.canonical_name] = true
+    end
+
+    def add_option_default(option_instance:)
+      @option_values[option_instance.canonical_name] ||= option_instance.value_wrapper
+      @option_values[option_instance.canonical_name].update(option_instance.default)
     end
 
     def add_argument(value:)
@@ -28,20 +35,12 @@ module Partner
       end
     end
 
-    def command_word_list
-      @command_word_list
-    end
-
     def command
       if @command_word_list.length > 0
         @command_word_list.join(" ")
       else
         nil
       end
-    end
-
-    def arguments
-      @arguments
     end
   end
 end

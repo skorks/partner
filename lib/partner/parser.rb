@@ -36,12 +36,32 @@ module Partner
 
     class PreParsingPhase < BasePhase
       def execute
+        [
+          UpdateResultWithDefaultOptionValues.new(parsing_context: parsing_context),
+        ].each(&:execute)
         # UpdateResultWithDefaultOptionValues
         # DeriveOptionTypesFromDefaultValues
         # EnsureNoCanonicalOptionNameConflicts
         # EnsureNoLongOptionNameConflicts
         # EnsureNoShortOptionNameConflicts
         # GenerateShortNamesForOptions
+      end
+
+      class UpdateResultWithDefaultOptionValues
+        attr_reader :parsing_context
+
+        def initialize(parsing_context:)
+          @parsing_context = parsing_context
+        end
+
+        def execute
+          parsing_context.config.options_with_defaults.each do |option_instance|
+            parsing_context.result.add_option_default(option_instance: option_instance)
+          end
+          # unless parsing_context.config.valid_command?(parsing_context.result.command)
+          #   raise Error::InvalidCommandError.new(parsing_context.result.command)
+          # end
+        end
       end
     end
 

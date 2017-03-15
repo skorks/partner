@@ -54,5 +54,12 @@ module Partner
     def valid_command?(command_string)
       @valid_commands.has_key?(command_string)
     end
+
+    def options_with_defaults
+      @options_by_canonical_name.keys.reduce([]) do |acc, key|
+        acc << @options_by_canonical_name[key] if @options_by_canonical_name[key].default
+        acc
+      end
+    end
   end
 end
