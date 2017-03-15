@@ -2,24 +2,43 @@ require "partner/token_iterator"
 require "partner/parsing_context"
 require "partner/token_classifier"
 require "partner/error"
+require "logger"
 
 module Partner
   class Parser
-    attr_reader :config
-
-    def initialize(config:)
-      @config = config
+    def initialize(config_syntax: NullSyntax, logger: nil)
+      @config_syntax = config_syntax
+      @logger = logger
     end
 
-    def parse(args)
-      p args
-      parsing_context = ParsingContext.new(config: config, token_iterator: TokenIterator.new(args: args))
+    def parse(args = ARGV)
+      Partner.logger = Logger.new($stdout).tap do |logger|
+        logger.level = Logger::DEBUG
+      end
+      Partner.logger.info("HELLO")
+      if block_given?
+        syntax = @config_syntax.new
+        yield(syntax)
+        config = syntax.config
 
-      PreParsingPhase.new(parsing_context: parsing_context).execute
-      ParsingPhase.new(parsing_context: parsing_context).execute
-      PostParsingPhase.new(parsing_context: parsing_context).execute
+        parsing_context = ParsingContext.new(config: config, token_iterator: TokenIterator.new(args: args))
 
-      parsing_context.result
+        PreParsingPhase.new(parsing_context: parsing_context).execute
+        ParsingPhase.new(parsing_context: parsing_context).execute
+        PostParsingPhase.new(parsing_context: parsing_context).execute
+
+        parsing_context.result
+      else
+        raise "Not configuration provided for parser, please supply a configuration block to '#{__method__}'"
+      end
+    end
+
+    class NullSyntax
+      attr_accessor :config
+
+      def initialize
+        @config = nil
+      end
     end
 
     class BasePhase

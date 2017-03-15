@@ -126,10 +126,9 @@ feature list
 - implement command support                                                                           DONE
 - make sure default values are taken into account during parsing (pre parsing)                        DONE
 - support required options                                                                            DONE
-- support dependant options
-- support conflicting options
 - make sure we error out correctly when erroneous conditions occur (e.g. unknown option etc )      DONE
 - support more different option types (integer, float) and allow casting correctly                 DONE
+- work out how the parser will actually be configured with options and how it will get access to the config object
 - get some logging happening and allow a logger to be configurable
 - figure out a way to supply syntax definitions which can be mapped to out configuration objects
 - try to actually create a couple of different syntax definitions with mappings to configurations objects
@@ -140,6 +139,8 @@ feature list
 - type and default value must match
 - long, short and canonical names can't conflict
 - make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format)
+- support dependant options
+- support conflicting options
 
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
 - should we be able to suppress errors?????

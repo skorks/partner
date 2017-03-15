@@ -6,7 +6,8 @@ require "partner/option"
 require "partner/parser"
 
 module Partner
-  # class << self
+  class << self
+    attr_accessor :logger
   #   def configure(&block)
   #     # TODO appropriately wrap in begin rescue end
   #     option_template_library = OptionTemplateLibrary.new
@@ -21,5 +22,5 @@ module Partner
   #       logger.level = Logger::DEBUG
   #     end
   #   end
-  # end
+  end
 end
