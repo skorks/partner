@@ -58,9 +58,6 @@ module Partner
           parsing_context.config.options_with_defaults.each do |option_instance|
             parsing_context.result.add_option_default(option_instance: option_instance)
           end
-          # unless parsing_context.config.valid_command?(parsing_context.result.command)
-          #   raise Error::InvalidCommandError.new(parsing_context.result.command)
-          # end
         end
       end
     end
@@ -87,6 +84,7 @@ module Partner
       def execute
         [
           EnsureCommandValid.new(parsing_context: parsing_context),
+          EnsureRequiredOptionsGiven.new(parsing_context: parsing_context),
         ].each(&:execute)
         # EnsureRequiredOptionsGiven
         # EnsureDependenciesSatisfied
@@ -103,6 +101,26 @@ module Partner
         def execute
           unless parsing_context.config.valid_command?(parsing_context.result.command)
             raise Error::InvalidCommandError.new(parsing_context.result.command)
+          end
+        end
+      end
+
+      class EnsureRequiredOptionsGiven
+        attr_reader :parsing_context
+
+        def initialize(parsing_context:)
+          @parsing_context = parsing_context
+        end
+
+        def execute
+          result = parsing_context.config.required_options.reduce([]) do |acc, option_instance|
+            unless parsing_context.result.option_has_value?(option_instance: option_instance)
+              acc << option_instance.canonical_name
+            end
+            acc
+          end
+          if result.length > 0
+            raise Error::RequiredOptionsMissingError.new(result)
           end
         end
       end

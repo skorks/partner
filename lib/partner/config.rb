@@ -61,5 +61,12 @@ module Partner
         acc
       end
     end
+
+    def required_options
+      @options_by_canonical_name.keys.reduce([]) do |acc, key|
+        acc << @options_by_canonical_name[key] if @options_by_canonical_name[key].required
+        acc
+      end
+    end
   end
 end

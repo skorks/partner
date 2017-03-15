@@ -125,7 +125,7 @@ feature list
 - support options that can be specified multiple times and their values should be bundled into a list DONE
 - implement command support                                                                           DONE
 - make sure default values are taken into account during parsing (pre parsing)                        DONE
-- support required options
+- support required options                                                                            DONE
 - support dependant options
 - support conflicting options
 - make sure we error out correctly when erroneous conditions occur (e.g. unknown option etc )      DONE

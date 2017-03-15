@@ -14,5 +14,8 @@ module Partner
 
     class InvalidCommandError < InputError
     end
+
+    class RequiredOptionsMissingError < InputError
+    end
   end
 end

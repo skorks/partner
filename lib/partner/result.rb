@@ -42,5 +42,9 @@ module Partner
         nil
       end
     end
+
+    def option_has_value?(option_instance:)
+      @option_values[option_instance.canonical_name]
+    end
   end
 end

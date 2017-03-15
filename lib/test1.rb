@@ -2,7 +2,7 @@ require "shellwords"
 require "partner"
 
 config = Partner::Config.new
-config.add_option(Partner::Option.build(canonical_name: :foo, type: "integer", default: 55))
+config.add_option(Partner::Option.build(canonical_name: :foo, type: "integer", default: 55, required: true))
 config.add_option(Partner::Option.build(canonical_name: :bob, type: "boolean", short: "-b"))
 config.add_option(Partner::Option.build(canonical_name: :bar, type: "boolean"))
 config.add_option(Partner::Option.build(canonical_name: :combi, type: "string", short: "-m"))
@@ -22,7 +22,7 @@ config.add_command("feet are   really great")
 # p config.instance_variable_get("@valid_commands")
 # p config.instance_variable_get("@command_tree")
 
-args = Shellwords.split(%Q(--foo 124 tooty --cleg 'brown fox' -mcake -b --c x fruity -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
+args = Shellwords.split(%Q(tooty --cleg 'brown fox' -mcake -b --c x fruity -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
 result = Partner::Parser.new(config: config).parse(args)
 # p result
 p result.option_values
