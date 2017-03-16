@@ -1,21 +1,21 @@
+require "logger"
+
 require "partner/token_iterator"
 require "partner/parsing_context"
 require "partner/token_classifier"
 require "partner/error"
-require "logger"
+require "partner/config_syntax/basic"
 
 module Partner
   class Parser
-    def initialize(config_syntax: NullSyntax, logger: nil)
+    def initialize(config_syntax: Partner::ConfigSyntax::Basic, logger: nil)
       @config_syntax = config_syntax
-      @logger = logger
+      Partner.logger = logger || Logger.new(File.open(File::NULL, "w"))
     end
 
     def parse(args = ARGV)
-      Partner.logger = Logger.new($stdout).tap do |logger|
-        logger.level = Logger::DEBUG
-      end
-      Partner.logger.info("HELLO")
+      Partner.logger.debug{ "#{self.class}.#{__method__}" }
+
       if block_given?
         syntax = @config_syntax.new
         yield(syntax)
@@ -32,6 +32,8 @@ module Partner
         raise "Not configuration provided for parser, please supply a configuration block to '#{__method__}'"
       end
     end
+
+    private
 
     class NullSyntax
       attr_accessor :config
