@@ -56,3 +56,12 @@ p result.option_values
 p result.given_options
 p result.command
 p result.arguments
+
+# require "partner/option_types/base"
+# require "partner/option_types/string_type"
+# require "partner/option_types/array_type"
+# Partner::OptionTypes::ArrayType.new.name
+# Partner::OptionTypes::ArrayType.new.name_aliases
+#
+# require "partner/option_type_map"
+# map = Partner::OptionTypeMap.build

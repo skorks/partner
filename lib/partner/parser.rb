@@ -8,9 +8,21 @@ require "partner/config_syntax/basic"
 
 module Partner
   class Parser
-    def initialize(config_syntax: Partner::ConfigSyntax::Basic, logger: nil)
+    def initialize(
+      config_syntax: Partner::ConfigSyntax::Basic,
+      logger: nil,
+      extra_option_types: [],
+      extra_token_types: [],
+      extra_pre_parsing_steps: [],
+      extra_post_parsing_steps: []
+    )
       @config_syntax = config_syntax
+
       Partner.logger = logger || Logger.new(File.open(File::NULL, "w"))
+      Partner.extra_option_types = extra_option_types || []
+      Partner.extra_token_types = extra_token_types || []
+      Partner.extra_pre_parsing_steps = extra_pre_parsing_steps || []
+      Partner.extra_post_parsing_steps = extra_post_parsing_steps || []
     end
 
     def parse(args = ARGV)

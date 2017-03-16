@@ -1,3 +1,5 @@
+require "partner/option_value"
+
 module Partner
   class Result
     attr_reader :arguments, :given_options, :command_word_list
@@ -10,13 +12,13 @@ module Partner
     end
 
     def add_option(option_instance:, value:)
-      @option_values[option_instance.canonical_name] ||= option_instance.value_wrapper
+      @option_values[option_instance.canonical_name] ||= OptionValue.new(option_instance.type)
       @option_values[option_instance.canonical_name].update(value)
       @given_options[option_instance.canonical_name] = true
     end
 
     def add_option_default(option_instance:)
-      @option_values[option_instance.canonical_name] ||= option_instance.value_wrapper
+      @option_values[option_instance.canonical_name] ||= OptionValue.new(option_instance.type)
       @option_values[option_instance.canonical_name].update(option_instance.default)
     end
 
