@@ -35,14 +35,6 @@ module Partner
 
     private
 
-    class NullSyntax
-      attr_accessor :config
-
-      def initialize
-        @config = nil
-      end
-    end
-
     class BasePhase
       attr_reader :parsing_context
 
@@ -107,7 +99,6 @@ module Partner
           EnsureCommandValid.new(parsing_context: parsing_context),
           EnsureRequiredOptionsGiven.new(parsing_context: parsing_context),
         ].each(&:execute)
-        # EnsureRequiredOptionsGiven
         # EnsureDependenciesSatisfied
         # EnsureNoConflicts
       end

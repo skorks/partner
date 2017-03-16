@@ -131,8 +131,8 @@ feature list
 - get some logging happening and allow a logger to be configurable                                 DONE
 - figure out a way to supply syntax definitions which can be mapped to out configuration objects   DONE
 - create a basic syntax definition                                                                 DONE
-- work out how the parser will actually be configured with options and how it will get access to the config object
 - support generating long option name from canonical name for options before parsing               DONE
+- work out how the parser will actually be configured with options and how it will get access to the config object
 - support generating short options name from canonical name and other options before parsing
 - support deriving type from the default value before parsing for all options
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate
@@ -143,6 +143,8 @@ feature list
 - support conflicting options
 - should be able to have string aliases for types (integer, int, i)
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
+- should be able to prevent generation of short option name if so desire
+
 
 - validations for option values
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
@@ -155,6 +157,13 @@ feature list
 - aliases for options, so they can be known by multiple names
 - single hyphen prefix for long options ???
 - try out creating alternative syntax definitions outside of the partner namespace
+- should be able to provide a version with a specific output when it is specified (and then exit successfully)
+- should be able to provide help text with a specific output when it is specified (and then exit successfully)
+- should be able to have a handler for any option which is executed when option is specified and either exit or not (terminating handler and non-terminating handler)
+- should be able to prompt for a value
+- should be able to securely prompt for a value
+- we need to perhaps audit out errors a little to make sure we don't have type proliferation and make sure they all inherit from Partner::Error
+
 
 - audit trollop tests to make sure we can do everything that trollop can do as well
 - write a bunch of lower level unit tests to ensure non-breakiness of specific classes
