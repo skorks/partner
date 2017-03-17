@@ -37,8 +37,8 @@ module Partner
       end
     end
 
-    def update_short_hash
-      @options_by_short[option.short] = option if option.short
+    def update_short_name_index(option_instance)
+      index_by_short_name(option_instance)
     end
 
     def find_option_by_long(token)
@@ -62,6 +62,7 @@ module Partner
     end
 
     def valid_command?(command_string)
+      return true unless command_string
       @valid_commands.has_key?(command_string)
     end
 
@@ -83,6 +84,10 @@ module Partner
 
     def has_short_name?(option_instance)
       option_instance.short && option_instance.short != :none
+    end
+
+    def needs_short_name?(option_instance)
+      !option_instance.short && option_instance.short != :none
     end
 
     def index_by_canonical_name(option_instance)
@@ -110,7 +115,7 @@ module Partner
           @existing_short_names[option_instance.short] = true
         end
       else
-        @options_requiring_short_names << option_instance
+        @options_requiring_short_names << option_instance if needs_short_name?(option_instance)
       end
     end
   end

@@ -140,6 +140,8 @@ feature list
 - should be able to prevent generation of short option name if so desire   DONE
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate
 
+- ensure that given long options start with -- and uses dashes instead of underscores
+- ensure that given short options start with - and is one letter
 
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
 - validations for option values
@@ -161,6 +163,7 @@ feature list
 - we need to perhaps audit out errors a little to make sure we don't have type proliferation and make sure they all inherit from Partner::Error
 - support dependant options
 - support conflicting options
+- more debug and info style logging so we can use logging to actually debug what's happening
 
 
 - audit trollop tests to make sure we can do everything that trollop can do as well

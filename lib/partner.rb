@@ -4,6 +4,7 @@ require "partner/config"
 require "partner/option"
 
 require "partner/parser"
+require "partner/error"
 
 module Partner
   class << self

@@ -95,6 +95,7 @@ module Partner
             possible_short_names = OptionUtils.generate_possible_short_names(option_instance.canonical_name)
             generated_short_name = OptionUtils.generate_short_name(possible_short_names, existing_short_names)
             option_instance.short = generated_short_name
+            parsing_context.config.update_short_name_index(option_instance)
           end
         end
       end
