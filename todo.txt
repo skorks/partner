@@ -136,14 +136,12 @@ feature list
 - support generating short options name from canonical name and other options before parsing       DONE
 - long, short and canonical names can't conflict      DONE
 - should be able to have string aliases for types (integer, int, i)                                DONE
+- make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format) DONE
+- should be able to prevent generation of short option name if so desire   DONE
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate
-- make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format)
+
+
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
-- should be able to prevent generation of short option name if so desire
-- support dependant options
-- support conflicting options
-
-
 - validations for option values
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
 - should we be able to suppress errors?????
@@ -161,6 +159,8 @@ feature list
 - should be able to prompt for a value
 - should be able to securely prompt for a value
 - we need to perhaps audit out errors a little to make sure we don't have type proliferation and make sure they all inherit from Partner::Error
+- support dependant options
+- support conflicting options
 
 
 - audit trollop tests to make sure we can do everything that trollop can do as well

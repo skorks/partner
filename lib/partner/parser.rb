@@ -66,10 +66,6 @@ module Partner
           UpdateResultWithDefaultOptionValues.new(parsing_context: parsing_context),
           GenerateShortNamesForOptions.new(parsing_context: parsing_context),
         ].each(&:execute)
-        # DeriveOptionTypesFromDefaultValues
-        # EnsureNoCanonicalOptionNameConflicts
-        # EnsureNoLongOptionNameConflicts
-        # EnsureNoShortOptionNameConflicts
       end
 
       class UpdateResultWithDefaultOptionValues

@@ -53,7 +53,4 @@ result = Partner::Parser.new(logger: logger).parse(args) do |s|
   s.command "feet are   really great"
 end
 
-p result.option_values
-p result.given_options
-p result.command
-p result.arguments
+puts result.to_h

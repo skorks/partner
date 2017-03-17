@@ -48,5 +48,14 @@ module Partner
     def option_has_value?(option_instance:)
       @option_values[option_instance.canonical_name]
     end
+
+    def to_h
+      {
+        command: command,
+        options: option_values,
+        arguments: arguments,
+        given_options: given_options,
+      }
+    end
   end
 end
