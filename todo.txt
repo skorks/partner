@@ -134,14 +134,14 @@ feature list
 - support generating long option name from canonical name for options before parsing               DONE
 - work out how the parser will actually be configured with options and how it will get access to the config object DONE
 - support generating short options name from canonical name and other options before parsing       DONE
-- write a whole bunch of high level tests to make sure all the functionality works as appropriate
-- long, short and canonical names can't conflict
-- make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format)
-- support dependant options
-- support conflicting options
+- long, short and canonical names can't conflict      DONE
 - should be able to have string aliases for types (integer, int, i)                                DONE
+- write a whole bunch of high level tests to make sure all the functionality works as appropriate
+- make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format)
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
 - should be able to prevent generation of short option name if so desire
+- support dependant options
+- support conflicting options
 
 
 - validations for option values

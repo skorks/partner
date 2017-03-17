@@ -1,3 +1,5 @@
+require "partner/error"
+
 module Partner
   class Config
     attr_reader :existing_short_names, :options_requiring_short_names
@@ -13,15 +15,10 @@ module Partner
       @options_requiring_short_names = []
     end
 
-    def add_option(option)
-      @options_by_canonical_name[option.canonical_name] = option
-      @options_by_long[option.long] = option
-      if has_short_name?(option)
-        @options_by_short[option.short] = option
-        @existing_short_names[option.short] = true
-      else
-        @options_requiring_short_names << option
-      end
+    def add_option(option_instance)
+      index_by_canonical_name(option_instance)
+      index_by_long_name(option_instance)
+      index_by_short_name(option_instance)
     end
 
     def add_command(command_string)
@@ -86,6 +83,35 @@ module Partner
 
     def has_short_name?(option_instance)
       option_instance.short && option_instance.short != :none
+    end
+
+    def index_by_canonical_name(option_instance)
+      if @options_by_canonical_name.has_key?(option_instance.canonical_name)
+        raise ConflictingCanonicalOptionNameError.new(option_instance.canonical_name)
+      else
+        @options_by_canonical_name[option_instance.canonical_name] = option_instance
+      end
+    end
+
+    def index_by_long_name(option_instance)
+      if @options_by_long.has_key?(option_instance.long)
+        raise ConflictingLongOptionNameError.new(option_instance.long)
+      else
+        @options_by_long[option_instance.long] = option_instance
+      end
+    end
+
+    def index_by_short_name(option_instance)
+      if has_short_name?(option_instance)
+        if @options_by_short.has_key?(option_instance.short)
+          raise ConflictingShortOptionNameError.new(option_instance.short)
+        else
+          @options_by_short[option_instance.short] = option_instance
+          @existing_short_names[option_instance.short] = true
+        end
+      else
+        @options_requiring_short_names << option_instance
+      end
     end
   end
 end

@@ -35,6 +35,7 @@ result = Partner::Parser.new(logger: logger).parse(args) do |s|
   # s.option canonical_name: :version, type: "boolean", handler: "1.2.3"
   # s.option canonical_name: :help, type: "boolean", handler: Partner::OptionHandler::Help
   s.option canonical_name: :foo, type: "integer", default: 55, required: true
+  s.option canonical_name: :foo2, type: "string", short: :none
   s.option canonical_name: :bob, type: "boolean", short: "-b"
   s.option canonical_name: :bar, type: "boolean"
   s.option canonical_name: :combi, type: "string", short: "-m"
