@@ -8,7 +8,7 @@ module Partner
         if parsing_context.config.valid_command_word_order?(token, parsing_context.result.command_word_list)
           parsing_context.result.add_command_word(value: token)
         else
-          raise Error::InvalidCommandError.new([parsing_context.result.command_word_list, token].flatten.join(" "))
+          raise InvalidCommandError.new([parsing_context.result.command_word_list, token].flatten.join(" "))
         end
       end
     end

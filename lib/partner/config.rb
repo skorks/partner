@@ -1,5 +1,7 @@
 module Partner
   class Config
+    attr_reader :existing_short_names, :options_requiring_short_names
+
     def initialize
       @options_by_canonical_name = {}
       @options_by_short = {}
@@ -7,12 +9,19 @@ module Partner
       @command_tree = {}
       @valid_commands = {}
       @valid_command_words = {}
+      @existing_short_names = {}
+      @options_requiring_short_names = []
     end
 
     def add_option(option)
       @options_by_canonical_name[option.canonical_name] = option
       @options_by_long[option.long] = option
-      @options_by_short[option.short] = option if option.short
+      if has_short_name?(option)
+        @options_by_short[option.short] = option
+        @existing_short_names[option.short] = true
+      else
+        @options_requiring_short_names << option
+      end
     end
 
     def add_command(command_string)
@@ -29,6 +38,10 @@ module Partner
           current_hash = current_hash[command_word]
         end
       end
+    end
+
+    def update_short_hash
+      @options_by_short[option.short] = option if option.short
     end
 
     def find_option_by_long(token)
@@ -67,6 +80,12 @@ module Partner
         acc << @options_by_canonical_name[key] if @options_by_canonical_name[key].required
         acc
       end
+    end
+
+    private
+
+    def has_short_name?(option_instance)
+      option_instance.short && option_instance.short != :none
     end
   end
 end

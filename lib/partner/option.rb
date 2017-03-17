@@ -44,6 +44,8 @@ module Partner
       :depends_on, :conflicts_with, :handler,
       :validator, :aliases
 
+    attr_writer :short
+
     def_delegators :type, :requires_argument?
 
     def initialize(

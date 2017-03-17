@@ -7,8 +7,8 @@ module Partner
       def process(token)
         option_instance = parsing_context.config.find_option_by_short(token)
 
-        raise Error::UnknownOptionError.new(token) unless option_instance
-        raise Error::MissingOptionArgumentError.new(token) if option_instance.requires_argument? && !parsing_context.token_iterator.has_next?
+        raise UnknownOptionError.new(token) unless option_instance
+        raise MissingOptionArgumentError.new(token) if option_instance.requires_argument? && !parsing_context.token_iterator.has_next?
 
         if option_instance.requires_argument?
           value = parsing_context.token_iterator.next

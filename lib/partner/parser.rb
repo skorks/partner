@@ -5,6 +5,7 @@ require "partner/parsing_context"
 require "partner/token_classifier"
 require "partner/error"
 require "partner/config_syntax/basic"
+require "partner/option_utils"
 
 module Partner
   class Parser
@@ -63,13 +64,12 @@ module Partner
       def execute
         [
           UpdateResultWithDefaultOptionValues.new(parsing_context: parsing_context),
+          GenerateShortNamesForOptions.new(parsing_context: parsing_context),
         ].each(&:execute)
-        # UpdateResultWithDefaultOptionValues
         # DeriveOptionTypesFromDefaultValues
         # EnsureNoCanonicalOptionNameConflicts
         # EnsureNoLongOptionNameConflicts
         # EnsureNoShortOptionNameConflicts
-        # GenerateShortNamesForOptions
       end
 
       class UpdateResultWithDefaultOptionValues
@@ -82,6 +82,23 @@ module Partner
         def execute
           parsing_context.config.options_with_defaults.each do |option_instance|
             parsing_context.result.add_option_default(option_instance: option_instance)
+          end
+        end
+      end
+
+      class GenerateShortNamesForOptions
+        attr_reader :parsing_context
+
+        def initialize(parsing_context:)
+          @parsing_context = parsing_context
+        end
+
+        def execute
+          existing_short_names = parsing_context.config.existing_short_names
+          parsing_context.config.options_requiring_short_names.each do |option_instance|
+            possible_short_names = OptionUtils.generate_possible_short_names(option_instance.canonical_name)
+            generated_short_name = OptionUtils.generate_short_name(possible_short_names, existing_short_names)
+            option_instance.short = generated_short_name
           end
         end
       end
@@ -124,7 +141,7 @@ module Partner
 
         def execute
           unless parsing_context.config.valid_command?(parsing_context.result.command)
-            raise Error::InvalidCommandError.new(parsing_context.result.command)
+            raise InvalidCommandError.new(parsing_context.result.command)
           end
         end
       end
@@ -144,7 +161,7 @@ module Partner
             acc
           end
           if result.length > 0
-            raise Error::RequiredOptionsMissingError.new(result)
+            raise RequiredOptionsMissingError.new(result)
           end
         end
       end
