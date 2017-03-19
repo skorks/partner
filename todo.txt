@@ -142,12 +142,15 @@ feature list
 - ensure that given short options start with - and is one letter DONE
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate
 
+- should not be able to negate non-boolen options
+- special handling of version and help including specia configuration
+- should be able to configure help to be printed out on any parsing error (silence the actual error or not)
+
 
 - refactor the config class to not be so messy
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
 - validations for option values
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
-- should we be able to suppress errors?????
 - what about some way to print out some basic usage for the command line app
 - ability for user to define their own custom types similar to how slop does it
 - ability for the user to define custom pre parsing steps
@@ -165,6 +168,9 @@ feature list
 - support dependant options
 - support conflicting options
 - more debug and info style logging so we can use logging to actually debug what's happening
+- write a good readme
+- create a nice set of examples
+- should we be able to suppress errors?????
 
 
 - audit trollop tests to make sure we can do everything that trollop can do as well

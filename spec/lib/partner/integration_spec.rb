@@ -4,28 +4,6 @@ require "partner/error"
 
 RSpec.describe Partner do
   let(:parser) { Partner::Parser.new }
-  # let(:result) do
-  #   Partner::Parser.new.parse(args, &block)
-    # do |s|
-      # s.option canonical_name: :foo, type: "integer", default: 55, required: true
-      # s.option canonical_name: :foo2, type: "string", short: :none
-      # s.option canonical_name: :bob, type: "boolean", short: "-b"
-      # s.option canonical_name: :bar, type: "boolean"
-      # s.option canonical_name: :combi, type: "string", short: "-m"
-      # s.option canonical_name: :sss, type: "boolean", short: "-s"
-      # s.option canonical_name: :ppp, type: "boolean", short: "-p"
-      # s.option canonical_name: :qqq, type: "boolean", short: "-q"
-      # s.option canonical_name: :baz, type: "string"
-      # s.option canonical_name: :abc, type: "array[string]"
-      # s.option canonical_name: :def, type: "array[integer]"
-      # s.option canonical_name: :cleg, type: "string"
-      # s.option canonical_name: :c, type: "string"
-      # s.option canonical_name: :cred, type: "string"
-      # s.command "tooty fruity"
-      # s.command "feet\n"
-      # s.command "feet are   really great"
-    # end
-  # end
   let(:args) { Shellwords.split(args_string) }
   let(:block) { ->(s){} }
   let(:args_string) { "" }
@@ -134,4 +112,75 @@ RSpec.describe Partner do
       end
     end
   end
+
+  # a string option is configured
+    # and an option argument is not given on the command line when using long name
+      # it raises an appropriate error
+    # and an option argument is not given on the command line when using short name
+      # it raises an appropriate error
+    # an an option argument is given on the command line when using long name
+      # the result contains the option with the given value
+    # an an option argument is given on the command line when using short name
+      # the result contains the option with the given value
+    # and it has a default value
+      # and the option is not given on the command line at all
+        # the result contains the option with the default value
+        # the option is not marked as given
+      # and the option is given on the command line
+        # the result contains the option with the given value
+        # the option is marked as given
+    # and option argument is given on the command line via equals when using long name
+      # the result contains the option with the given value
+    # and option argument is given on the command line via equals when using short name
+      # the result contains the option with the given value
+    # and option argument is given on the command line using short option with value
+      # the result contains the option with the given value
+    # the option long name can't be negated
+    # and it is configured to be required
+      # and it is not given on the command line
+        # it raises an appropriate error
+    # and another string option is configured
+      # and we attempt to give it the same long name as the first option
+        # it raises an appropriate error
+      # and we attempt to give it the same short name as the first option
+        # it raises an appropriate error
+  # an integer option is configured
+    # an an option argument is given on the command line
+      # the result contains the option with the given value
+      # the value is of the appropriate type
+    # and it has a type alias which is used for configuration
+      # an an option argument is given on the command line
+        # the result contains the option with the given value
+        # the value is of the appropriate type
+  # a float option is configured
+    # an an option argument is given on the command line
+      # the result contains the option with the given value
+      # the value is of the appropriate type
+  # a boolean option is configured
+    # and another boolean option is configured
+      # both boolean options can be given on the command line using combined format
+      # the result contains both options with truthy values
+      # both options are marked as given
+    # and the option long name is given negated on the command line
+      # the result contains the option with a falsy value
+      # the option is marked as given
+  # a terminator is given on the command line
+    # all subsequent tokens are treated as arguments
+  # an integer array option is configured
+    # and the option argument is given on the command line via comma separated string
+      # the result contains the option with the given values
+      # all values in the list are of the appropriate type
+    # and the option argument is given on the command line multiple times
+      # the result contains the option with all the given values combined into a list
+      # all values in the list are of the appropriate type
+  # a single word command is configured
+    # and the command is not given on the command line
+      # it does not raise an error
+    # and the command is given on the command line
+      # the result contains the given command
+  # a multi word command is configured
+    # and the command is given with the words out of order
+      # it raises an appropriate error
+    # and the command is given with some of the words missing
+      # it raises an appropriate error
 end
