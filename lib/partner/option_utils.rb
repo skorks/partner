@@ -33,6 +33,14 @@ module Partner
         end
         generated_short_name
       end
+
+      def long_name_format_valid?(long_name)
+        !!/^--[0-9a-zA-Z-]+$/.match(long_name)
+      end
+
+      def short_name_format_valid?(short_name)
+        !!/^-[0-9a-zA-Z-]{1}$/.match(short_name)
+      end
     end
   end
 end

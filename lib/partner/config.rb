@@ -1,4 +1,5 @@
 require "partner/error"
+require "partner/option_utils"
 
 module Partner
   class Config
@@ -16,6 +17,8 @@ module Partner
     end
 
     def add_option(option_instance)
+      ensure_long_name_format_valid(option_instance)
+      ensure_short_name_format_valid(option_instance)
       index_by_canonical_name(option_instance)
       index_by_long_name(option_instance)
       index_by_short_name(option_instance)
@@ -116,6 +119,18 @@ module Partner
         end
       else
         @options_requiring_short_names << option_instance if needs_short_name?(option_instance)
+      end
+    end
+
+    def ensure_long_name_format_valid(option_instance)
+      if option_instance.long && !OptionUtils.long_name_format_valid?(option_instance.long)
+        raise InvalidLongOptionNameError.new(option_instance.long)
+      end
+    end
+
+    def ensure_short_name_format_valid(option_instance)
+      if has_short_name?(option_instance) && !OptionUtils.short_name_format_valid?(option_instance.short)
+        raise InvalidShortOptionNameError.new(option_instance.long)
       end
     end
   end

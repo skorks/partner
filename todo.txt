@@ -138,11 +138,12 @@ feature list
 - should be able to have string aliases for types (integer, int, i)                                DONE
 - make sure that we can spit out a result that's useful (i.e. we can access all the things we need in reasonable format) DONE
 - should be able to prevent generation of short option name if so desire   DONE
+- ensure that given long options start with -- and uses dashes instead of underscores DONE
+- ensure that given short options start with - and is one letter DONE
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate
 
-- ensure that given long options start with -- and uses dashes instead of underscores
-- ensure that given short options start with - and is one letter
 
+- refactor the config class to not be so messy
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
 - validations for option values
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily

@@ -39,7 +39,7 @@ result = Partner::Parser.new(logger: logger).parse(args) do |s|
   s.option canonical_name: :bob, type: "boolean", short: "-b"
   s.option canonical_name: :bar, type: "boolean"
   s.option canonical_name: :combi, type: "string", short: "-m"
-  s.option canonical_name: :sss, type: "boolean", short: "-s"
+  s.option canonical_name: :sss, type: "boolean", short: "-s", long: "--blab"
   s.option canonical_name: :ppp, type: "boolean", short: "-p"
   s.option canonical_name: :qqq, type: "boolean", short: "-q"
   s.option canonical_name: :baz, type: "string"

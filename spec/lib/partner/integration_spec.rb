@@ -1,5 +1,6 @@
-require "partner"
 require "shellwords"
+require "partner"
+require "partner/error"
 
 RSpec.describe Partner do
   let(:parser) { Partner::Parser.new }
@@ -29,7 +30,7 @@ RSpec.describe Partner do
   let(:block) { ->(s){} }
   let(:args_string) { "" }
 
-  describe "a basic option is configured" do
+  describe "when a basic option is configured" do
     let(:block) do
       ->(s){
         s.option canonical_name: :foo
@@ -51,7 +52,7 @@ RSpec.describe Partner do
       expect(result.option_values).to include(foo: true)
     end
 
-    context "when long name is given" do
+    context "with a long name" do
       let(:block) do
         ->(s){
           s.option canonical_name: :foo, long: "--foo2"
@@ -66,9 +67,21 @@ RSpec.describe Partner do
         result = parser.parse(Shellwords.split("--foo2"), &block)
         expect(result.option_values).to include(foo: true)
       end
+
+      context "which is invalid format" do
+        let(:block) do
+          ->(s){
+            s.option canonical_name: :foo, long: "-foo2"
+          }
+        end
+
+        it "raises an appropriate error" do
+          expect { parser.parse(Shellwords.split("-foo2"), &block) }.to raise_error(Partner::InvalidLongOptionNameError)
+        end
+      end
     end
 
-    context "when short name is given" do
+    context "with a short name" do
       let(:block) do
         ->(s){
           s.option canonical_name: :foo, short: "-x"
@@ -83,21 +96,33 @@ RSpec.describe Partner do
         result = parser.parse(Shellwords.split("-x"), &block)
         expect(result.option_values).to include(foo: true)
       end
+
+      context "which is invalid format" do
+        let(:block) do
+          ->(s){
+            s.option canonical_name: :foo, short: "-xx"
+          }
+        end
+
+        it "raises an appropriate error" do
+          expect { parser.parse(Shellwords.split("-xx"), &block) }.to raise_error(Partner::InvalidShortOptionNameError)
+        end
+      end
     end
 
-    context "when an unknown long option is given" do
+    context "and an invalid long option is given" do
       it "raises an appropriate error" do
         expect { parser.parse(Shellwords.split("--foo2"), &block) }.to raise_error(Partner::UnknownOptionError)
       end
     end
 
-    context "when an unknown short option is given" do
+    context "and an invalid short option is given" do
       it "raises an appropriate error" do
         expect { parser.parse(Shellwords.split("-x"), &block) }.to raise_error(Partner::UnknownOptionError)
       end
     end
 
-    context "when short name is disabled" do
+    context "with a disabled short name" do
       let(:block) do
         ->(s){
           s.option canonical_name: :foo, short: :none

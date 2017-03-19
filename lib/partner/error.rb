@@ -9,4 +9,6 @@ module Partner
   class ConflictingCanonicalOptionNameError < InputError; end
   class ConflictingLongOptionNameError < InputError; end
   class ConflictingShortOptionNameError < InputError; end
+  class InvalidLongOptionNameError < InputError; end
+  class InvalidShortOptionNameError < InputError; end
 end
