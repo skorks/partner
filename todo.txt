@@ -145,6 +145,7 @@ feature list
 - should not be able to negate non-boolen options
 - special handling of version and help including specia configuration
 - should be able to configure help to be printed out on any parsing error (silence the actual error or not)
+- should be able to specify type as a symbol
 
 
 - refactor the config class to not be so messy

@@ -113,74 +113,328 @@ RSpec.describe Partner do
     end
   end
 
-  # a string option is configured
-    # and an option argument is not given on the command line when using long name
-      # it raises an appropriate error
-    # and an option argument is not given on the command line when using short name
-      # it raises an appropriate error
-    # an an option argument is given on the command line when using long name
-      # the result contains the option with the given value
-    # an an option argument is given on the command line when using short name
-      # the result contains the option with the given value
-    # and it has a default value
-      # and the option is not given on the command line at all
-        # the result contains the option with the default value
-        # the option is not marked as given
-      # and the option is given on the command line
-        # the result contains the option with the given value
-        # the option is marked as given
-    # and option argument is given on the command line via equals when using long name
-      # the result contains the option with the given value
-    # and option argument is given on the command line via equals when using short name
-      # the result contains the option with the given value
-    # and option argument is given on the command line using short option with value
-      # the result contains the option with the given value
-    # the option long name can't be negated
-    # and it is configured to be required
-      # and it is not given on the command line
-        # it raises an appropriate error
-    # and another string option is configured
-      # and we attempt to give it the same long name as the first option
-        # it raises an appropriate error
-      # and we attempt to give it the same short name as the first option
-        # it raises an appropriate error
-  # an integer option is configured
-    # an an option argument is given on the command line
-      # the result contains the option with the given value
-      # the value is of the appropriate type
-    # and it has a type alias which is used for configuration
-      # an an option argument is given on the command line
-        # the result contains the option with the given value
-        # the value is of the appropriate type
-  # a float option is configured
-    # an an option argument is given on the command line
-      # the result contains the option with the given value
-      # the value is of the appropriate type
-  # a boolean option is configured
-    # and another boolean option is configured
-      # both boolean options can be given on the command line using combined format
-      # the result contains both options with truthy values
-      # both options are marked as given
-    # and the option long name is given negated on the command line
-      # the result contains the option with a falsy value
-      # the option is marked as given
-  # a terminator is given on the command line
-    # all subsequent tokens are treated as arguments
-  # an integer array option is configured
-    # and the option argument is given on the command line via comma separated string
-      # the result contains the option with the given values
-      # all values in the list are of the appropriate type
-    # and the option argument is given on the command line multiple times
-      # the result contains the option with all the given values combined into a list
-      # all values in the list are of the appropriate type
-  # a single word command is configured
-    # and the command is not given on the command line
-      # it does not raise an error
-    # and the command is given on the command line
-      # the result contains the given command
-  # a multi word command is configured
-    # and the command is given with the words out of order
-      # it raises an appropriate error
-    # and the command is given with some of the words missing
-      # it raises an appropriate error
+  describe "when a string option is configured" do
+    let(:block) do
+      ->(s){
+        s.option canonical_name: :foo, type: "string", short: "-f"
+      }
+    end
+
+    context "and an option argument is not given on the command line when using long name" do
+      it "raises an appropriate error" do
+        expect { parser.parse(Shellwords.split("--foo"), &block) }.to raise_error(Partner::MissingOptionArgumentError)
+      end
+    end
+
+    context "and an option argument is not given on the command line when using short name" do
+      it "raises an appropriate error" do
+        expect { parser.parse(Shellwords.split("-f"), &block) }.to raise_error(Partner::MissingOptionArgumentError)
+      end
+    end
+
+    context "an an option argument is given on the command line when using long name" do
+      it "the result contains the option with the given value" do
+        result = parser.parse(Shellwords.split("--foo blah"), &block)
+        expect(result.option_values).to include(foo: "blah")
+      end
+    end
+
+    context "an an option argument is given on the command line when using short name" do
+      it "the result contains the option with the given value" do
+        result = parser.parse(Shellwords.split("-f blah"), &block)
+        expect(result.option_values).to include(foo: "blah")
+      end
+    end
+
+    context "and it has a default value" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: "string", short: "-f", default: "hello"
+        }
+      end
+
+      context "and the option is not given on the command line" do
+        let(:result) { parser.parse(Shellwords.split(""), &block) }
+
+        it "the result contains the option with the default value" do
+          expect(result.option_values).to include(foo: "hello")
+        end
+
+        it "the option is not marked as given" do
+          expect(result.given_options).to_not include(foo: true)
+        end
+      end
+
+      context "and the option is given on the command line" do
+        let(:result) { parser.parse(Shellwords.split("-f 'yadda'"), &block) }
+
+        it "the result contains the option with the given value" do
+          expect(result.option_values).to include(foo: "yadda")
+        end
+
+        it "the option is marked as given" do
+          expect(result.given_options).to include(foo: true)
+        end
+      end
+    end
+
+    context "and option argument is given on the command line via equals when using long name" do
+      let(:result) { parser.parse(Shellwords.split("--foo='yadda 123'"), &block) }
+
+      it "the result contains the option with the given value" do
+        expect(result.option_values).to include(foo: "yadda 123")
+      end
+    end
+
+    context "and option argument is given on the command line via equals when using short name" do
+      let(:result) { parser.parse(Shellwords.split("-f='yadda 123 234'"), &block) }
+
+      it "the result contains the option with the given value" do
+        expect(result.option_values).to include(foo: "yadda 123 234")
+      end
+    end
+
+    context "and option argument is given on the command line using short option with value" do
+      let(:result) { parser.parse(Shellwords.split("-fbar"), &block) }
+
+      it "the result contains the option with the given value" do
+        expect(result.option_values).to include(foo: "bar")
+      end
+    end
+
+    it "the option long name can't be negated" do
+      expect { parser.parse(Shellwords.split("--no-foo"), &block) }.to raise_error(Partner::InvalidOptionNegationError)
+    end
+
+    context "and it is configured to be required" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: "string", short: "-f", default: "hello", required: true
+        }
+      end
+
+      context "and an option argument is not given on the command line" do
+        it "raises an appropriate error" do
+          expect { parser.parse(Shellwords.split(""), &block) }.to raise_error(Partner::RequiredOptionsMissingError)
+        end
+      end
+    end
+
+    context "and another string option is configured" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: "string", short: "-f", default: "hello", required: true
+          s.option canonical_name: :bar, type: "string"
+        }
+      end
+
+      context "and we attempt to give it the same long name as the first option" do
+        let(:block) do
+          ->(s){
+            s.option canonical_name: :foo, type: "string", long: "--foo", short: "-f", default: "hello", required: true
+            s.option canonical_name: :bar, type: "string", long: "--foo"
+          }
+        end
+
+        it "raises an appropriate error" do
+          expect { parser.parse(Shellwords.split(""), &block) }.to raise_error(Partner::ConflictingLongOptionNameError)
+        end
+      end
+
+      context "and we attempt to give it the same short name as the first option" do
+        let(:block) do
+          ->(s){
+            s.option canonical_name: :foo, type: "string", long: "--foo", short: "-f", default: "hello", required: true
+            s.option canonical_name: :bar, type: "string", short: "-f"
+          }
+        end
+
+        it "raises an appropriate error" do
+          expect { parser.parse(Shellwords.split(""), &block) }.to raise_error(Partner::ConflictingShortOptionNameError)
+        end
+      end
+    end
+  end
+
+  context "when an integer option is configured" do
+    let(:block) do
+      ->(s){
+        s.option canonical_name: :foo, type: "integer"
+      }
+    end
+
+    context "and an option argument is given on the command line" do
+      let(:result) { parser.parse(Shellwords.split("--foo 234"), &block) }
+
+      it "the result contains the option with the given value" do
+        expect(result.option_values).to include(foo: 234)
+      end
+
+      it "the value is of the appropriate type" do
+        expect(result.option_values[:foo].class).to eq Integer
+      end
+    end
+
+    context "and it has a type alias which is used for configuration" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: "i"
+        }
+      end
+
+      context "and an option argument is given on the command line" do
+        let(:result) { parser.parse(Shellwords.split("--foo 234"), &block) }
+
+        it "the result contains the option with the given value" do
+          expect(result.option_values).to include(foo: 234)
+        end
+
+        it "the value is of the appropriate type" do
+          expect(result.option_values[:foo].class).to eq Integer
+        end
+      end
+    end
+  end
+
+  context "when a float option is configured" do
+    let(:block) do
+      ->(s){
+        s.option canonical_name: :foo, type: "float"
+      }
+    end
+
+    context "and an option argument is given on the command line" do
+      let(:result) { parser.parse(Shellwords.split("--foo 2.34"), &block) }
+
+      it "the result contains the option with the given value" do
+        expect(result.option_values).to include(foo: 2.34)
+      end
+
+      it "the value is of the appropriate type" do
+        expect(result.option_values[:foo].class).to eq Float
+      end
+    end
+  end
+
+  context "when a boolean option is configured" do
+    let(:block) do
+      ->(s){
+        s.option canonical_name: :foo, type: "bool"
+      }
+    end
+
+    context "and another boolean option is configured" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: "bool"
+          s.option canonical_name: :bar, type: "b"
+        }
+      end
+      let(:result) { parser.parse(Shellwords.split("-fb"), &block) }
+
+      it "the result contains both options with truthy values" do
+        expect(result.option_values).to include(foo: true, bar: true)
+      end
+
+      it "both options are marked as given" do
+        expect(result.given_options).to include(foo: true, bar: true)
+      end
+    end
+
+    context "and the option long name is given negated on the command line" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: "boolean"
+        }
+      end
+      let(:result) { parser.parse(Shellwords.split("--no-foo"), &block) }
+
+      it "the result contains the options with a falsy values" do
+        expect(result.option_values).to include(foo: false)
+      end
+
+      it "the option is marked as given" do
+        expect(result.given_options).to include(foo: true)
+      end
+    end
+  end
+
+  describe "when a terminator is given on the command line" do
+    let(:block) do
+      ->(s){
+        s.option canonical_name: :foo, type: "boolean"
+      }
+    end
+    let(:result) { parser.parse(Shellwords.split("--foo -- --bar -b"), &block) }
+
+    it "all subsequent tokens are treated as arguments" do
+      expect(result.arguments).to include("--bar", "-b")
+    end
+  end
+
+  describe "when an integer array option is configured" do
+    let(:block) do
+      ->(s){
+        s.option canonical_name: :foo, type: "array[int]"
+      }
+    end
+
+    context "and the option argument is given on the command line via comma separated string" do
+      let(:result) { parser.parse(Shellwords.split("-f 3,33,45"), &block) }
+
+      it "the result contains the option with the given values" do
+        expect(result.option_values).to include(foo: [3,33,45])
+      end
+    end
+
+    context "and the option argument is given on the command line via comma separated string" do
+      let(:result) { parser.parse(Shellwords.split("-f 3,33,45 --foo 87"), &block) }
+
+      it "the result contains the option with the given values" do
+        expect(result.option_values).to include(foo: [3,33,45,87])
+      end
+    end
+  end
+
+  describe "when a single word command is configured" do
+    let(:block) do
+      ->(s){
+        s.command "hello"
+      }
+    end
+
+    context "and the command is not given on the command line" do
+      it "does not raise an error" do
+        expect{ parser.parse(Shellwords.split(""), &block) }.to_not raise_error
+      end
+    end
+
+    context "and the command is given on the command line" do
+      let(:result) { parser.parse(Shellwords.split("hello"), &block) }
+
+      it "the result contains the given command" do
+        expect(result.command).to eq "hello"
+      end
+    end
+  end
+
+  describe "when a multi word command is configured" do
+    let(:block) do
+      ->(s){
+        s.command "hello world foo"
+      }
+    end
+
+    context "and the command is given with the words out of order" do
+      it "raises an appropriate error" do
+        expect { parser.parse(Shellwords.split("hello foo world"), &block) }.to raise_error(Partner::InvalidCommandError)
+      end
+    end
+
+    context "and the command is given with some of the words missing" do
+      it "raises an appropriate error" do
+        expect { parser.parse(Shellwords.split("hello world"), &block) }.to raise_error(Partner::InvalidCommandError)
+      end
+    end
+  end
 end

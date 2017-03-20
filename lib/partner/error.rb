@@ -11,4 +11,5 @@ module Partner
   class ConflictingShortOptionNameError < InputError; end
   class InvalidLongOptionNameError < InputError; end
   class InvalidShortOptionNameError < InputError; end
+  class InvalidOptionNegationError < InputError; end
 end

@@ -7,6 +7,7 @@ module Partner
         token.start_with?('-') &&
         !token.start_with?('--') &&
         token.length > 2 &&
+        !token.include?("=") &&
         valid_short_options?(split_into_short_options(token)[0..0]) &&
         !valid_short_options?(split_into_short_options(token)[1..-1])
       end

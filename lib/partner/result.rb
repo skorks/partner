@@ -49,6 +49,10 @@ module Partner
       @option_values[option_instance.canonical_name]
     end
 
+    def option_given?(option_instance:)
+      @given_options[option_instance.canonical_name]
+    end
+
     def to_h
       {
         command: command,

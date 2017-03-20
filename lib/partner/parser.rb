@@ -152,7 +152,7 @@ module Partner
 
         def execute
           result = parsing_context.config.required_options.reduce([]) do |acc, option_instance|
-            unless parsing_context.result.option_has_value?(option_instance: option_instance)
+            unless parsing_context.result.option_given?(option_instance: option_instance)
               acc << option_instance.canonical_name
             end
             acc

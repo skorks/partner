@@ -1,4 +1,5 @@
 require "partner/option_types/base"
+require "bigdecimal"
 
 module Partner
   module OptionTypes
@@ -9,7 +10,7 @@ module Partner
 
       def cast(value)
         # TODO work out if it's ok for it to be using BigDecimal
-        BigDecimal.new(value)
+        BigDecimal.new(value).to_f
       end
     end
   end
