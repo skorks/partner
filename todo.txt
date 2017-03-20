@@ -140,13 +140,12 @@ feature list
 - should be able to prevent generation of short option name if so desire   DONE
 - ensure that given long options start with -- and uses dashes instead of underscores DONE
 - ensure that given short options start with - and is one letter DONE
-- write a whole bunch of high level tests to make sure all the functionality works as appropriate
+- write a whole bunch of high level tests to make sure all the functionality works as appropriate DONE
+- should not be able to negate non-boolean options DONE
+- should be able to specify type as a symbol DONE
 
-- should not be able to negate non-boolen options
-- special handling of version and help including specia configuration
+- special handling of version and help including special configuration
 - should be able to configure help to be printed out on any parsing error (silence the actual error or not)
-- should be able to specify type as a symbol
-
 
 - refactor the config class to not be so messy
 - should be able to have aliases for option names (--foo is the same as --bar or --baz)
@@ -166,6 +165,7 @@ feature list
 - should be able to prompt for a value
 - should be able to securely prompt for a value
 - we need to perhaps audit out errors a little to make sure we don't have type proliferation and make sure they all inherit from Partner::Error
+- more tests
 - support dependant options
 - support conflicting options
 - more debug and info style logging so we can use logging to actually debug what's happening

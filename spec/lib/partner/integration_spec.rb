@@ -146,6 +146,19 @@ RSpec.describe Partner do
       end
     end
 
+    context "type is given as a symbol" do
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :foo, type: :string, short: "-f"
+        }
+      end
+
+      it "the result contains the option with the given value" do
+        result = parser.parse(Shellwords.split("-f blah"), &block)
+        expect(result.option_values).to include(foo: "blah")
+      end
+    end
+
     context "and it has a default value" do
       let(:block) do
         ->(s){
