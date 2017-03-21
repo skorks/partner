@@ -6,9 +6,11 @@ module Partner
     attr_reader :existing_short_names, :options_requiring_short_names
 
     def initialize
-      @options_by_canonical_name = {}
-      @options_by_short = {}
-      @options_by_long = {}
+      @options = []
+      @options_index = {}
+      # @options_by_canonical_name = {}
+      # @options_by_short = {}
+      # @options_by_long = {}
       @command_tree = {}
       @valid_commands = {}
       @valid_command_words = {}
@@ -19,9 +21,144 @@ module Partner
     def add_option(option_instance)
       ensure_long_name_format_valid(option_instance)
       ensure_short_name_format_valid(option_instance)
-      index_by_canonical_name(option_instance)
-      index_by_long_name(option_instance)
-      index_by_short_name(option_instance)
+      ensure_no_canonical_name_conflict(option_instance)
+      ensure_no_long_name_conflict(option_instance)
+      ensure_no_short_name_conflict(option_instance)
+
+      # @options << option_instance
+      # index_option(option_instance)
+      # index_by_canonical_name(option_instance)
+      # index_by_long_name(option_instance)
+      # index_by_short_name(option_instance)
+      OptionIndexer.new(options_index: options_index).index(option_instance)
+    end
+
+    class OptionsIndex
+      attr_reader :existing_short_names, :options_requiring_short_names
+      attr_reader :options_with_defaults, :required_options
+
+      def initialize
+        @options = []
+        @options_index = {}
+        @existing_short_names = {}
+        @options_requiring_short_names = []
+        @options_with_defaults = []
+        @required_options = []
+      end
+
+      def add(option_instance)
+        @options << option_instance
+        index_by_all_names(option_instance)
+        index_by_all_aliases(option_instance)
+        index_by_short_name(option_instance)
+      end
+
+      def contains?(key)
+        @options_index.has_key?(key.to_s)
+      end
+
+      private
+
+      def index_by_all_names(option_instance)
+        option_instance.all_names.each do |option_alias|
+          @options_index[option_alias] = option_instance
+        end
+      end
+
+      def index_by_all_aliases(option_instance)
+        option_instance.all_aliases.each do |option_alias|
+          next if @options_index.has_key?(option_alias)
+          @options_index[option_alias] = option_instance
+        end
+      end
+
+      def index_by_short_name(option_instance)
+        if option_instance.has_short_name?
+          @existing_short_names[option_instance.short.to_s] = true
+        else
+          @options_requiring_short_names << option_instance if option_instance.needs_short_name?
+        end
+      end
+    end
+
+    class OptionsIndexer
+      attr_reader :options_index
+
+      def initialize(options_index:)
+        @options_index = options_index
+      end
+
+      def index(option_instance)
+        consistency_checks.each do |check_class|
+          check_class.new(options_index: options_index, option_instance: option_instance).execute
+        end
+        options_index.add(option_instance)
+      end
+
+      def consistency_checks
+        [
+          ConsistencyCheck::LongNameFormatValid,
+          ConsistencyCheck::ShortNameFormatValid,
+          ConsistencyCheck::NoCanonicalNameConflict,
+          ConsistencyCheck::NoLongNameConflict,
+          ConsistencyCheck::NoShortNameConflict,
+        ]
+      end
+
+      module ConsistencyCheck
+        class Base
+          attr_reader :options_index, :option_instance
+
+          def initialize(options_index:, option_instance:)
+            @options_index = options_index
+            @option_instance = option_instance
+          end
+
+          def execute
+            raise "Not Implemented"
+          end
+        end
+
+        class LongNameFormatValid
+          def execute
+            if option_instance.long && !OptionUtils.long_name_format_valid?(option_instance.long)
+              raise InvalidLongOptionNameError.new(option_instance.long)
+            end
+          end
+        end
+
+        class ShortNameFormatValid
+          def execute
+            if option_instance.has_short_name? && !OptionUtils.short_name_format_valid?(option_instance.short)
+              raise InvalidShortOptionNameError.new(option_instance.short)
+            end
+          end
+        end
+
+        class NoCanonicalNameConflict
+          def execute
+            if options_index.contains?(option_instance.canonical_name.to_s)
+              raise ConflictingCanonicalOptionNameError.new(option_instance.canonical_name)
+            end
+          end
+        end
+
+        class NoLongNameConflict
+          def execute
+            if options_index.contains?(option_instance.long.to_s)
+              raise ConflictingLongOptionNameError.new(option_instance.long)
+            end
+          end
+        end
+
+        class NoShortNameConflict
+          def execute
+            if option_instance.has_short_name? && options_index.contains?(option_instance.short.to_s)
+              raise ConflictingShortOptionNameError.new(option_instance.short)
+            end
+          end
+        end
+      end
     end
 
     def add_command(command_string)
@@ -70,68 +207,80 @@ module Partner
     end
 
     def options_with_defaults
-      @options_by_canonical_name.keys.reduce([]) do |acc, key|
-        acc << @options_by_canonical_name[key] if @options_by_canonical_name[key].default
+      @options.reduce([]) do |acc, option_instance|
+        acc << option_instance if option_instance.default
         acc
       end
     end
 
     def required_options
-      @options_by_canonical_name.keys.reduce([]) do |acc, key|
-        acc << @options_by_canonical_name[key] if @options_by_canonical_name[key].required
+      @options.reduce([]) do |acc, option_instance|
+        acc << option_instance if option_instance.required
         acc
       end
     end
 
+    def valid_option?(token)
+      !!@options_index[token.to_s]
+    end
+
     private
 
-    def has_short_name?(option_instance)
-      option_instance.short && option_instance.short != :none
-    end
-
-    def needs_short_name?(option_instance)
-      !option_instance.short && option_instance.short != :none
-    end
-
-    def index_by_canonical_name(option_instance)
-      if @options_by_canonical_name.has_key?(option_instance.canonical_name)
-        raise ConflictingCanonicalOptionNameError.new(option_instance.canonical_name)
-      else
-        @options_by_canonical_name[option_instance.canonical_name] = option_instance
-      end
-    end
-
-    def index_by_long_name(option_instance)
-      if @options_by_long.has_key?(option_instance.long)
-        raise ConflictingLongOptionNameError.new(option_instance.long)
-      else
-        @options_by_long[option_instance.long] = option_instance
-      end
-    end
-
-    def index_by_short_name(option_instance)
-      if has_short_name?(option_instance)
-        if @options_by_short.has_key?(option_instance.short)
-          raise ConflictingShortOptionNameError.new(option_instance.short)
-        else
-          @options_by_short[option_instance.short] = option_instance
-          @existing_short_names[option_instance.short] = true
-        end
-      else
-        @options_requiring_short_names << option_instance if needs_short_name?(option_instance)
-      end
-    end
-
-    def ensure_long_name_format_valid(option_instance)
-      if option_instance.long && !OptionUtils.long_name_format_valid?(option_instance.long)
-        raise InvalidLongOptionNameError.new(option_instance.long)
-      end
-    end
-
-    def ensure_short_name_format_valid(option_instance)
-      if has_short_name?(option_instance) && !OptionUtils.short_name_format_valid?(option_instance.short)
-        raise InvalidShortOptionNameError.new(option_instance.long)
-      end
-    end
+    # def index_option(option_instance)
+    #   index_by_all_names(option_instance)
+    #   index_by_all_aliases(option_instance)
+    #   index_by_short_name(option_instance)
+    # end
+    #
+    # def index_by_all_names(option_instance)
+    #   option_instance.all_names.each do |option_alias|
+    #     @options_index[option_alias] = option_instance
+    #   end
+    # end
+    #
+    # def index_by_all_aliases(option_instance)
+    #   option_instance.all_aliases.each do |option_alias|
+    #     next if @options_index.has_key?(option_alias)
+    #     @options_index[option_alias] = option_instance
+    #   end
+    # end
+    #
+    # def index_by_short_name(option_instance)
+    #   if option_instance.has_short_name?
+    #     @existing_short_names[option_instance.short.to_s] = true
+    #   else
+    #     @options_requiring_short_names << option_instance if option_instance.needs_short_name?
+    #   end
+    # end
+    #
+    # def ensure_long_name_format_valid(option_instance)
+    #   if option_instance.long && !OptionUtils.long_name_format_valid?(option_instance.long)
+    #     raise InvalidLongOptionNameError.new(option_instance.long)
+    #   end
+    # end
+    #
+    # def ensure_short_name_format_valid(option_instance)
+    #   if option_instance.has_short_name? && !OptionUtils.short_name_format_valid?(option_instance.short)
+    #     raise InvalidShortOptionNameError.new(option_instance.long)
+    #   end
+    # end
+    #
+    # def ensure_no_canonical_name_conflict(option_instance)
+    #   if @options_index.has_key?(option_instance.canonical_name.to_s)
+    #     raise ConflictingCanonicalOptionNameError.new(option_instance.canonical_name)
+    #   end
+    # end
+    #
+    # def ensure_no_long_name_conflict(option_instance)
+    #   if @options_index.has_key?(option_instance.long.to_s)
+    #     raise ConflictingLongOptionNameError.new(option_instance.long)
+    #   end
+    # end
+    #
+    # def ensure_no_short_name_conflict(option_instance)
+    #   if option_instance.has_short_name? && @options_index.has_key?(option_instance.short.to_s)
+    #     raise ConflictingShortOptionNameError.new(option_instance.short)
+    #   end
+    # end
   end
 end

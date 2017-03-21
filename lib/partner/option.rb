@@ -21,8 +21,9 @@ module Partner
         validator: nil,
         aliases: []
       )
+        canonical_name = canonical_name.to_s
         type = OptionTypeMap.build.find_by_name(type) || OptionTypes::BooleanType.new
-        long ||= OptionUtils.long_name_from_canonical_name(canonical_name)
+        long = long.to_s || OptionUtils.long_name_from_canonical_name(canonical_name)
         new(
           canonical_name: canonical_name,
           type: type,
@@ -72,6 +73,26 @@ module Partner
       @handler = handler
       @validator = validator
       @aliases = aliases
+    end
+
+    def has_short_name?
+      short && short != :none
+    end
+
+    def needs_short_name?
+      !short && short != :none
+    end
+
+    def all_names
+      list = []
+      list << canonical_name.to_s
+      list << long.to_s
+      list << short.to_s if needs_short_name?
+      list
+    end
+
+    def all_aliases
+      aliases.map(&:to_s).uniq
     end
   end
 end
