@@ -5,7 +5,7 @@ module Partner
   module TokenProcessor
     class LongOption < Base
       def process(token)
-        option_instance = parsing_context.config.find_option_by_long(token)
+        option_instance = parsing_context.config.find_option(token)
 
         raise UnknownOptionError.new(token) unless option_instance
         raise MissingOptionArgumentError.new(token) if option_instance.requires_argument? && !parsing_context.token_iterator.has_next?

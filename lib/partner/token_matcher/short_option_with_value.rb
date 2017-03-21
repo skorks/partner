@@ -19,7 +19,7 @@ module Partner
       end
 
       def valid_short_options?(list)
-        list.all? { |short_options_token| config.find_option_by_short(short_options_token) }
+        list.all? { |short_options_token| config.find_option(short_options_token) }
       end
     end
   end
