@@ -91,10 +91,14 @@ module Partner
 
         def execute
           existing_short_names = parsing_context.config.existing_short_names
+          updated_options = []
           parsing_context.config.options_requiring_short_names.each do |option_instance|
             possible_short_names = OptionUtils.generate_possible_short_names(option_instance.canonical_name)
             generated_short_name = OptionUtils.generate_short_name(possible_short_names, existing_short_names)
             option_instance.short = generated_short_name
+            updated_options << option_instance
+          end
+          updated_options.each do |option_instance|
             parsing_context.config.update_short_name_index(option_instance)
           end
         end

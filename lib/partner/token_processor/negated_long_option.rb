@@ -5,7 +5,7 @@ module Partner
   module TokenProcessor
     class NegatedLongOption < Base
       def process(token)
-        option_instance = parsing_context.config.find_option_by_long(OptionUtils.long_name_from_negated_long_name(token))
+        option_instance = parsing_context.config.find_option(OptionUtils.long_name_from_negated_long_name(token))
 
         raise UnknownOptionError.new(token) unless option_instance
         raise InvalidOptionNegationError.new(token) unless option_instance.type.kind_of?(OptionTypes::BooleanType)

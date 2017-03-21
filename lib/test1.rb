@@ -23,7 +23,7 @@ require "logger"
 # p config.instance_variable_get("@valid_commands")
 # p config.instance_variable_get("@command_tree")
 
-args = Shellwords.split(%Q(tooty --cleg 'brown fox' -mcake -b --c x fruity -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
+args = Shellwords.split(%Q(--foo 210 tooty --cleg 'brown fox' -mcake -b --c x fruity -spq --no-bar --baz=hello --cred="world" --abc r,s,t --def 1 --def 3 --def 4 -- blah yadda))
 
 logger = Logger.new($stdout).tap do |l|
   l.level = Logger::DEBUG
@@ -47,7 +47,7 @@ result = Partner::Parser.new(logger: logger).parse(args) do |s|
   s.option canonical_name: :baz, type: "string"
   s.option canonical_name: :abc, type: "array[string]"
   s.option canonical_name: :def, type: "array[integer]"
-  s.option canonical_name: :cleg, type: "string"
+  s.option canonical_name: :cleg, type: "string", handler: "HELLO WORLD"
   s.option canonical_name: :c, type: "string"
   s.option canonical_name: :cred, type: "string"
   s.command "tooty fruity"
