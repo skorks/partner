@@ -3,7 +3,7 @@ require "partner/error"
 
 module Partner
   module TokenProcessor
-    class ShortOption < Base
+    class Option < Base
       def process(token)
         option_instance = parsing_context.config.find_option(token)
 

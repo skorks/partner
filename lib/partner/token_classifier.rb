@@ -1,21 +1,17 @@
 require "partner/token_matcher/terminator"
-require "partner/token_matcher/long_option"
-require "partner/token_matcher/short_option"
+require "partner/token_matcher/option"
+require "partner/token_matcher/option_with_value_via_equals"
 require "partner/token_matcher/negated_long_option"
 require "partner/token_matcher/short_option_with_value"
 require "partner/token_matcher/combined_short_options"
-require "partner/token_matcher/long_option_with_value_via_equals"
-require "partner/token_matcher/short_option_with_value_via_equals"
 require "partner/token_matcher/command_word"
 
 require "partner/token_processor/terminator"
-require "partner/token_processor/long_option"
-require "partner/token_processor/short_option"
+require "partner/token_processor/option"
+require "partner/token_processor/option_with_value_via_equals"
 require "partner/token_processor/negated_long_option"
 require "partner/token_processor/short_option_with_value"
 require "partner/token_processor/combined_short_options"
-require "partner/token_processor/long_option_with_value_via_equals"
-require "partner/token_processor/short_option_with_value_via_equals"
 require "partner/token_processor/argument"
 require "partner/token_processor/command_word"
 
@@ -23,13 +19,11 @@ module Partner
   class TokenClassifier
     MATCHER_TO_PROCESSOR = {
       TokenMatcher::Terminator => TokenProcessor::Terminator,
-      TokenMatcher::LongOption => TokenProcessor::LongOption,
-      TokenMatcher::ShortOption => TokenProcessor::ShortOption,
+      TokenMatcher::Option => TokenProcessor::Option,
+      TokenMatcher::OptionWithValueViaEquals => TokenProcessor::OptionWithValueViaEquals,
       TokenMatcher::NegatedLongOption => TokenProcessor::NegatedLongOption,
       TokenMatcher::ShortOptionWithValue => TokenProcessor::ShortOptionWithValue,
       TokenMatcher::CombinedShortOptions => TokenProcessor::CombinedShortOptions,
-      TokenMatcher::LongOptionWithValueViaEquals => TokenProcessor::LongOptionWithValueViaEquals,
-      TokenMatcher::ShortOptionWithValueViaEquals => TokenProcessor::ShortOptionWithValueViaEquals,
       TokenMatcher::CommandWord => TokenProcessor::CommandWord,
     }
 

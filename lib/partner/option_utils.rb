@@ -39,7 +39,11 @@ module Partner
       end
 
       def short_name_format_valid?(short_name)
-        !!/^-[0-9a-zA-Z-]{1}$/.match(short_name)
+        !!/^-[0-9a-zA-Z]{1}$/.match(short_name)
+      end
+
+      def split_into_short_options(token)
+        token[1, token.length].split("").map{|v| "-#{v}"}
       end
     end
   end

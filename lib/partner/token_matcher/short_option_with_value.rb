@@ -1,22 +1,16 @@
 require "partner/token_matcher/base"
+require "partner/option_utils"
 
 module Partner
   module TokenMatcher
     class ShortOptionWithValue < Base
       def matches?(token)
-        token.start_with?('-') &&
-        !token.start_with?('--') &&
-        token.length > 2 &&
-        !token.include?("=") &&
-        valid_short_options?(split_into_short_options(token)[0..0]) &&
-        !valid_short_options?(split_into_short_options(token)[1..-1])
+        /^-[a-zA-Z0-9]{1}[a-zA-Z0-9_-]+$/.match(token) &&
+        valid_short_options?(OptionUtils.split_into_short_options(token)[0..0]) &&
+        !valid_short_options?(OptionUtils.split_into_short_options(token)[1..-1])
       end
 
       private
-
-      def split_into_short_options(token)
-        token[1, token.length].split("").map{|v| "-#{v}"}
-      end
 
       def valid_short_options?(list)
         list.all? { |short_options_token| config.find_option(short_options_token) }
