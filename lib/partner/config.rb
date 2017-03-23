@@ -21,8 +21,8 @@ module Partner
       OptionsIndexer.new(options_index: @options_index).index(option_instance)
     end
 
-    def valid_option?(token)
-      !!@options_index.find_option(token)
+    def add_version_option(option_instance)
+      OptionsIndexer.new(options_index: @options_index).index(option_instance)
     end
 
     def add_command(command_string)
