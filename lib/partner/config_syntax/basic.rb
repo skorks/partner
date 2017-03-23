@@ -16,14 +16,8 @@ module Partner
         @config.add_option(Partner::Option.build(options))
       end
 
-      def version_option(options = {})
-        options[:canonical_name] ||= :version
-        options[:type] ||= "boolean"
-        options[:long] ||= "--version"
-        options[:short] ||= "-v"
-        options[:default] ||= options[:value]
-
-        @config.add_option(Partner::Option.build(options))
+      def version(value, options = {})
+        @config.add_option(Partner::Option.build_version(value, options))
       end
 
       def command(command_string)

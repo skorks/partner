@@ -32,7 +32,7 @@ end
 # result = Partner::Parser.new(config: config).parse(args)
 # result = Partner::Parser.new.parse(args)
 result = Partner::Parser.new(logger: logger).parse(args) do |s|
-  # s.version "1.2.3"
+  s.version "1.2.3"
   # s.help
   # s.option canonical_name: :version, type: "boolean", handler: "1.2.3"
   # s.option canonical_name: :help, type: "boolean", handler: Partner::OptionHandler::Help

@@ -148,17 +148,15 @@ feature list
 - should be able to configure help to be printed out on any parsing error (silence the actual error or not)
 
 - refactor the config class to not be so messy
-- should be able to have aliases for option names (--foo is the same as --bar or --baz)
+- should be able to have aliases for option names (--foo is the same as --bar or --baz) PROBABLY DONE NEEDS TESTS
 - validations for option values
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
 - what about some way to print out some basic usage for the command line app
 - ability for user to define their own custom types similar to how slop does it
-- ability for the user to define custom pre parsing steps
-- ability for the user to define custom post parsing steps
-- ability for the user to define their own custom types of tokens with a matcher and a processor for fully custom behaviour
-- aliases for options, so they can be known by multiple names
-- single hyphen prefix for long options ???
-- try out creating alternative syntax definitions outside of the partner namespace
+- ability for the user to define custom pre parsing steps PROBABLY DONE NEEDS TESTS
+- ability for the user to define custom post parsing steps PROBABLY DONE NEEDS TESTS
+- ability for the user to define their own custom types of tokens with a matcher and a processor for fully custom behaviour PROBABLY DONE NEEDS TESTS
+- try out creating alternative syntax definitions outside of the partner namespace PROBABLY DONE NEEDS TESTS
 - should be able to provide a version with a specific output when it is specified (and then exit successfully)
 - should be able to provide help text with a specific output when it is specified (and then exit successfully)
 - should be able to have a handler for any option which is executed when option is specified and either exit or not (terminating handler and non-terminating handler)
