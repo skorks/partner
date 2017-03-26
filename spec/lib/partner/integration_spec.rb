@@ -450,4 +450,60 @@ RSpec.describe Partner do
       end
     end
   end
+
+  describe "when a version option is configured" do
+    let(:block) do
+      ->(s){
+        s.version "abc123"
+      }
+    end
+
+    exit_exception = nil
+    before do
+      $stdout = StringIO.new
+      begin
+        result
+      rescue SystemExit => e
+        exit_exception = e
+      end
+      $stdout.rewind
+    end
+
+    context "and the option is given on the command line" do
+      let(:result) { parser.parse(Shellwords.split("--version"), &block) }
+
+      it "prints out the version string" do
+        expect($stdout.read.strip).to eq "abc123"
+      end
+
+      it "exits" do
+        expect(exit_exception).to_not be_nil
+      end
+
+      it "exits successfully" do
+        expect(exit_exception.status).to eq 0
+      end
+    end
+
+    context "using a regular option with a handler" do
+      let(:result) { parser.parse(Shellwords.split("--version"), &block) }
+      let(:block) do
+        ->(s){
+          s.option canonical_name: :version, handler: Partner::OptionHandler::VersionHandler.new("abc123")
+        }
+      end
+
+      it "prints out the version string" do
+        expect($stdout.read.strip).to eq "abc123"
+      end
+
+      it "exits" do
+        expect(exit_exception).to_not be_nil
+      end
+
+      it "exits successfully" do
+        expect(exit_exception.status).to eq 0
+      end
+    end
+  end
 end
