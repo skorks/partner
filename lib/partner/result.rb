@@ -1,4 +1,5 @@
 require "partner/option_value"
+require "partner/option_handler/terminating_string_handler"
 
 module Partner
   class Result
@@ -15,16 +16,11 @@ module Partner
       @option_values[option_instance.canonical_name] ||= OptionValue.new(option_instance.type)
       @option_values[option_instance.canonical_name].update(value)
       @given_options[option_instance.canonical_name] = true
-      if option_instance.handler
-        handler_instance = nil
-        if option_instance.handler.respond_to?(:execute)
-          handler_instance = option_instance.handler
-        else
-          handler_instance = option_instance.handler.new(value: @option_values[option_instance.canonical_name].raw, option_instance: option_instance)
-        end
-        handler_instance.execute
-        exit(0) if handler_instance.terminating?
-      end
+
+      ExecuteOptionHandler.new(
+        option_instance: option_instance,
+        option_value: @option_values[option_instance.canonical_name].raw
+      ).execute
     end
 
     def add_option_default(option_instance:)
@@ -70,6 +66,38 @@ module Partner
         arguments: arguments,
         given_options: given_options,
       }
+    end
+
+    class ExecuteOptionHandler
+      attr_reader :option_instance, :option_value
+
+      def initialize(option_instance:, option_value:)
+        @option_instance = option_instance
+        @option_value = option_value
+      end
+
+      def execute
+        return unless option_instance.handler
+
+        handler = possible_handler
+        handler_data = option_value
+
+        if possible_handler.kind_of?(String)
+          handler_data = possible_handler
+          handler = Partner::OptionHandler::TerminatingStringHandler.new
+        elsif possible_handler.kind_of?(Class)
+          handler = possible_handler.new
+        end
+
+        handler.execute(data: handler_data, option_instance: option_instance)
+        exit(0) if handler.terminating?
+      end
+
+      private
+
+      def possible_handler
+        option_instance.handler
+      end
     end
   end
 end

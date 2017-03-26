@@ -2,7 +2,6 @@ require "forwardable"
 require "partner/option_utils"
 require "partner/option_type_map"
 require "partner/option_types/boolean_type"
-require "partner/option_handler/version"
 
 module Partner
   class Option
@@ -31,7 +30,7 @@ module Partner
           type: "boolean",
           short: "-v",
           long: "--version",
-          handler: Partner::OptionHandler::Version.new(value: value)
+          handler: value,
         }
         build(default_attributes.merge(default_version_option_attributes).merge(attributes))
       end

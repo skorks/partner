@@ -143,8 +143,9 @@ feature list
 - write a whole bunch of high level tests to make sure all the functionality works as appropriate DONE
 - should not be able to negate non-boolean options DONE
 - should be able to specify type as a symbol DONE
+- special handling of version DONE
 
-- special handling of version and help including special configuration
+- special handling of help including special configuration
 - should be able to configure help to be printed out on any parsing error (silence the actual error or not)
 
 - refactor the config class to not be so messy
@@ -152,17 +153,17 @@ feature list
 - validations for option values
 - should not raise errors outside of the Partner namespace, so all errors during use can be rescued easily
 - what about some way to print out some basic usage for the command line app
-- ability for user to define their own custom types similar to how slop does it
+- ability for user to define their own custom types similar to how slop does it PROBABLY DONE NEEDS TESTS
 - ability for the user to define custom pre parsing steps PROBABLY DONE NEEDS TESTS
 - ability for the user to define custom post parsing steps PROBABLY DONE NEEDS TESTS
 - ability for the user to define their own custom types of tokens with a matcher and a processor for fully custom behaviour PROBABLY DONE NEEDS TESTS
 - try out creating alternative syntax definitions outside of the partner namespace PROBABLY DONE NEEDS TESTS
-- should be able to provide a version with a specific output when it is specified (and then exit successfully)
+- should be able to provide a version with a specific output when it is specified (and then exit successfully) PROBABLY DONE NEEDS TESTS
 - should be able to provide help text with a specific output when it is specified (and then exit successfully)
-- should be able to have a handler for any option which is executed when option is specified and either exit or not (terminating handler and non-terminating handler)
+- should be able to have a handler for any option which is executed when option is specified and either exit or not (terminating handler and non-terminating handler) PROBABLY DONE NEEDS TESTS
 - should be able to prompt for a value
 - should be able to securely prompt for a value
-- we need to perhaps audit out errors a little to make sure we don't have type proliferation and make sure they all inherit from Partner::Error
+- we need to perhaps audit out errors a little to make sure we don't have type proliferation and make sure they all inherit from Partner::Error PROBABLY DONE NEEDS TESTS
 - more tests
 - support dependant options
 - support conflicting options
@@ -170,6 +171,7 @@ feature list
 - write a good readme
 - create a nice set of examples
 - should we be able to suppress errors?????
+- more lower level tests for various interesting classes
 
 
 - audit trollop tests to make sure we can do everything that trollop can do as well
