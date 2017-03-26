@@ -5,11 +5,10 @@ module Partner
   module TokenProcessor
     class CommandWord < Base
       def process(token)
-        if parsing_context.config.valid_command_word_order?(token, parsing_context.result.command_word_list)
-          parsing_context.result.add_command_word(value: token)
-        else
+        unless parsing_context.config.valid_command_word_order?(token, parsing_context.result.command_word_list)
           raise InvalidCommandError.new([parsing_context.result.command_word_list, token].flatten.join(" "))
         end
+        parsing_context.result.add_command_word(value: token)
       end
     end
   end

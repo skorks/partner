@@ -16,6 +16,10 @@ module Partner
         @config.add_option(Partner::Option.build(options))
       end
 
+      def version(value, options = {})
+        @config.add_option(Partner::Option.build_version(value, options))
+      end
+
       def command(command_string)
         @config.add_command(command_string)
       end
